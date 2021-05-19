@@ -1,0 +1,13 @@
+<button
+    <% if (locals.type) { %>
+        type=<%- type %> 
+        <% } else { %>
+        type="button"
+    <% } %>
+    <% if (locals.onclick) { %>
+        onclick=<%- onclick %> 
+    <% } %>
+    class="rounded px-4 py-2 my-2 mx-1 bg-<%= color %>-500 hover:bg-<%= color %>-700 text-white"
+>
+    <%= text %>
+</button>
