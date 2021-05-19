@@ -1,38 +1,55 @@
 version: '3.7'
 
 services:
-  # api:
-
-  nginx:
-    build: ./nginx
-    container_name: nginx
-    restart: always
-    ports:
-      - "80:80"
-    
-  db:
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: finance-dev
-    image: postgres:latest
-    networks:
-      - default
-    ports:
-      - 5405:5432
-    restart: always
-    volumes:
-      - ./postgres-data:/var/lib/postgresql/data
-  web:
-    build: ./client
-    volumes:
-      - ./client:/usr/src/app/client
-      - node-modules:/usr/src/app/client/node_modules
-    networks:
-      - default
-    ports:
+  api:
+    container_name: shopping-api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports: 
+      - 5000:5000
+    volumes: 
+      - ./api:/usr/src/app
+  client:
+    container_name: shopping-client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports: 
       - 3000:3000
-    restart: always
+    volumes: 
+      - ./client:/usr/src/app/api
+
+  # nginx:
+  #   build: ./nginx
+  #   container_name: nginx
+  #   restart: always
+  #   ports:
+  #     - "80:80"
+    
+  # db:
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: finance-dev
+  #   image: postgres:latest
+  #   networks:
+  #     - default
+  #   ports:
+  #     - 5405:5432
+  #   restart: always
+  #   volumes:
+  #     - ./postgres-data:/var/lib/postgresql/data
+  # web:
+  #   build: ./client
+  #   volumes:
+  #     - ./client:/usr/src/app/client
+  #     - node-modules:/usr/src/app/client/node_modules
+  #   networks:
+  #     - default
+  #   ports:
+  #     - 3000:3000
+  #   restart: always
 
 volumes:
   node-modules:

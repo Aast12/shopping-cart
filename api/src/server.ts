@@ -6,7 +6,7 @@ import productsRouter from './routes/products';
 
 const PORT = 5000;
 
-const mongoDb = 'mongodb://127.0.0.1:27017/shop';
+const mongoDb = 'mongodb://host.docker.internal:27017/shop';
 
 const main = async () => {
     await mongoose.connect(mongoDb, {
@@ -25,11 +25,11 @@ const main = async () => {
 
     app.use('/products', productsRouter);
     app.use('/', (_, res) => {
-        res.send('Hello');
+        res.send('Hello!');
     });
 
     app.listen(PORT, () => {
-        console.log('Server running?');
+        console.log('Server running????');
     });
 };
 
