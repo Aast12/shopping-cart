@@ -3,6 +3,7 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import productsRouter from './routes/products';
+import cors from 'cors';
 
 const PORT = 5000;
 
@@ -17,7 +18,8 @@ const main = async () => {
     const app = express();
 
     app.use(express.static('public'));
-
+    app.use(cors());
+    
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());

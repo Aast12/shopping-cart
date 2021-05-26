@@ -14,6 +14,7 @@ import {
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import Landing from './pages/Landing';
 import NavBar from './components/NavBar';
+import Products from './pages/admin/Products';
 
 function App() {
     return (
@@ -21,6 +22,7 @@ function App() {
             <Router>
                 <NavBar />
                 <Switch>
+                    <Route path='/products' component={Products} />
                     <Route path="/" component={Landing} />
                 </Switch>
             </Router>

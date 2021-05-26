@@ -17,7 +17,7 @@ import { AiOutlineShoppingCart, AiFillCaretDown } from 'react-icons/ai';
 
 const NavBar = ({ ...props }: BoxProps) => {
     return (
-        <Box position="fixed" py={3} w="100%" borderBottomWidth={1}>
+        <Box py={3} w="100%" borderBottomWidth={1}>
             <Flex alignItems="center" justifyContent="space-around" w="100%">
                 <Heading size="md" mx={3}>
                     Shopping
