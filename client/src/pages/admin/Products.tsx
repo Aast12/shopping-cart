@@ -18,15 +18,14 @@ import {
     Select,
     ButtonGroup,
 } from '@chakra-ui/react';
-import { useEffect } from 'react';
 import { useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { Product } from '../../types/Products';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
+import useProducts from '../../hooks/useProducts';
 
 const Products = () => {
-    const [products, setProducts] = useState<Product[]>([]);
+    const { products, del, edit, create } = useProducts();
     const [filter, setFilter] = useState('');
 
     const [selected, setSelected] = useState<Product | undefined>();
@@ -41,79 +40,20 @@ const Products = () => {
         ...values
     }: Product & { image: FileList }) => {
         if (adding) {
-            createProduct({
+            create({
                 ...values,
                 description: description ?? '',
                 image: image[0],
             });
-        } else if (values._id) {
-            editProduct({
+        } else if (selected?._id) {
+            edit({
+                ...selected,
                 ...values,
                 description: description ?? '',
                 image: image[0],
             });
         }
     };
-
-    const createProduct = async (values: {
-        name: string;
-        price: number;
-        description: string;
-        image: File;
-    }) => {
-        const form = new FormData();
-        Object.keys(values).forEach((key) => {
-            // @ts-ignore
-            form.append(key, values[key]);
-        });
-
-        await axios
-            .post('/products/create', form)
-            .then(console.log)
-            .catch(console.error);
-    };
-
-    const deleteProduct = async () => {
-        const id = selected?._id;
-        await axios
-            .delete('/products/delete', { data: { id } })
-            .then((res) => {
-                console.log(res);
-                setProducts(products.filter((p) => p._id !== id));
-            })
-            .catch(console.error);
-    };
-
-    const editProduct = async (values: {
-        _id?: string;
-        name: string;
-        price: number;
-        description: string;
-        image: File;
-    }) => {
-        const form = new FormData();
-        Object.keys(values).forEach((key) => {
-            // @ts-ignore
-            form.append(key, values[key]);
-        });
-
-        await axios
-            .post('/products/update', form)
-            .then(console.log)
-            .catch(console.error);
-    };
-
-    useEffect(() => {
-        fetch('http://localhost:5000/products')
-            .then((res) => {
-                console.log(res);
-                return res.json();
-            })
-            .then((res) => {
-                console.log(res);
-                setProducts(res);
-            });
-    }, []);
 
     const setValues = (values: Product) => {
         setValue('name', values.name);
@@ -157,7 +97,7 @@ const Products = () => {
                                 .map((p) => (
                                     <option
                                         selected={selected?._id === p._id}
-                                        value={p._id}
+                                        value={p._id ?? ''}
                                     >
                                         {p.name}
                                     </option>
@@ -179,7 +119,9 @@ const Products = () => {
                             <InputGroup w="100%">
                                 <InputLeftElement children={<SearchIcon />} />
                                 <Input
-                                    onChange={(e) => setFilter(e.target.value.toLowerCase())}
+                                    onChange={(e) =>
+                                        setFilter(e.target.value.toLowerCase())
+                                    }
                                     variant="filled"
                                     rounded="full"
                                     type="text"
@@ -211,7 +153,7 @@ const Products = () => {
                                                     borderWidth={1}
                                                     borderRadius="md"
                                                     p={2}
-                                                    key={p._id}
+                                                    key={p._id ?? ''}
                                                     w="100%"
                                                 >
                                                     <Text>{p.name}</Text>
@@ -313,16 +255,20 @@ const Products = () => {
                                     {!adding ? (
                                         <ButtonGroup>
                                             <Button
-                                                onClick={deleteProduct}
+                                                onClick={() =>
+                                                    selected?._id &&
+                                                    del(selected._id)
+                                                }
                                                 colorScheme="red"
                                             >
                                                 Delete
                                             </Button>
                                             <Button
                                                 colorScheme="green"
-                                                onClick={() => {
-                                                    // Submit
-                                                }}
+                                                // onClick={() => {
+                                                //     // Submit
+                                                // }}
+                                                type="submit"
                                             >
                                                 Update
                                             </Button>
@@ -331,7 +277,7 @@ const Products = () => {
                                         <Button
                                             type="submit"
                                             colorScheme="green"
-                                            onClick={() => {}}
+                                            // onClick={() => {}}
                                         >
                                             Create
                                         </Button>

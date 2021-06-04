@@ -3,6 +3,9 @@ export type Product = {
     name: string;
     price: number;
     description?: string;
-    image?: string;
+    image?: {
+        contentType: string;
+        data: string;
+    };
     brand?: string;
 };
