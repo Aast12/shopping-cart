@@ -3,6 +3,7 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import productsRouter from './routes/products';
+import usersRouter from './routes/users';
 import cors from 'cors';
 
 const PORT = 5000;
@@ -26,6 +27,7 @@ const main = async () => {
     app.use(express.static(path.join(__dirname, 'public')));
 
     app.use('/products', productsRouter);
+    app.use('/users', usersRouter);
     app.use('/', (_, res) => {
         res.send('Hello!');
     });
