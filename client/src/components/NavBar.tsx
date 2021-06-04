@@ -15,15 +15,19 @@ import {
 } from '@chakra-ui/react';
 import { AiOutlineShoppingCart, AiFillCaretDown } from 'react-icons/ai';
 
+import { Link as RouterLink } from 'react-router-dom';
+
 const NavBar = ({ ...props }: BoxProps) => {
     return (
         <Box py={3} w="100%" borderBottomWidth={1}>
             <Flex alignItems="center" justifyContent="space-around" w="100%">
-                <Heading size="md" mx={3}>
+                <Heading size="md" mx={3} as={RouterLink} to="/">
                     Shopping
                 </Heading>
                 <HStack alignItems="center">
-                    <Link>Explore</Link>
+                    <Link as={RouterLink} to="/products">
+                        Explore
+                    </Link>
                     <IconButton
                         variant="ghost"
                         borderRadius="full"
