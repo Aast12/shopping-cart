@@ -1,23 +1,31 @@
 import { getModelForClass, prop } from '@typegoose/typegoose';
 
-class Product {
+export class Product {
     @prop({ unique: true })
-    public name: String;
+    public name: string;
 
     @prop({})
-    public price: Number;
+    public price: number;
 
     @prop({})
-    public description?: String;
+    public description?: string;
 
     @prop({})
     public image?: {
         data: Buffer;
-        contentType: String;
+        contentType: string;
     };
 
     @prop({})
-    public brand?: String;
+    public brand?: string;
+
+    @prop({ default: 0 })
+    public views?: number;
+
+    @prop({})
+    public lastView?: Date;
 }
 
-export default getModelForClass(Product);
+export default getModelForClass(Product, {
+    schemaOptions: { timestamps: true },
+});

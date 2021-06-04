@@ -9,7 +9,6 @@ const router = express.Router();
 
 router.get('/', async (_, res) => {
     const products = await getAllServices();
-    console.log(products);
 
     res.send(products);
 });
