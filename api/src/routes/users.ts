@@ -1,17 +1,35 @@
-import express from 'express';
+import express, { Request } from 'express';
 import Product from '../models/Product';
 
 import { createImage } from '../services/media';
 import { upload } from '../services/multer';
 import User from '../models/User';
+import { requireLogin } from '../middleware';
 
 const router = express.Router();
 
-// router.get('/', async (_, res) => {
-//     const products = await getAllServices();
+router.route('/').get(requireLogin, async (req: Request, res) => {
+    // @ts-ignore
+    const user = await User.findById(req.user.id);
 
-//     res.send(products);
-// });
+    console.log('->', user);
+    res.status(200).send(user);
+});
+
+router.get('/create', upload.single('image'), async (req, res) => {
+    try {
+        const newUser = new User(req.body);
+
+        if (req.file) {
+            newUser.profilePicture = createImage(req.file);
+        }
+
+        await newUser.save();
+        res.sendStatus(200);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+});
 
 router.post('/create', upload.single('image'), async (req, res) => {
     try {

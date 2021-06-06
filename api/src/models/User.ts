@@ -44,7 +44,7 @@ export class Order {
         return next();
     }
 })
-class User {
+export class User {
     @prop({})
     public givenName: string;
 
@@ -54,11 +54,14 @@ class User {
     @prop({})
     public dateOfBirth?: Date;
 
-    @prop({})
+    @prop({ unique: true })
     public email: string;
 
     @prop({})
     public password: string;
+
+    @prop({ default: 'user' })
+    public role: 'admin' | 'user';
 
     @prop({})
     public profilePicture?: {
