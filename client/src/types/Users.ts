@@ -1,4 +1,3 @@
-
 export type Order = {
     _id?: string;
     products: {
@@ -7,14 +6,14 @@ export type Order = {
         unitPrice: number;
     }[];
     total: number;
-    date: Date;
-}
+    date: string;
+};
 
 export type User = {
     _id: string;
     givenName: string;
     lastName: string;
-    dateOfBirth?: Date;
+    dateOfBirth?: string;
     email: string;
     // password: string;
     profilePicture?: {
@@ -22,4 +21,7 @@ export type User = {
         contentType: string;
     };
     orders?: Order[];
-}
+    role: 'admin' | 'user';
+    createdAt: string;
+    updatedAt: string;
+};

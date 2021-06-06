@@ -34,7 +34,13 @@ const NavBar = ({ ...props }: BoxProps) => {
                         aria-label="shopping cart"
                         icon={<AiOutlineShoppingCart />}
                     />
-                    <Button variant="ghost" rounded="full" px={2}>
+                    <Button
+                        variant="ghost"
+                        rounded="full"
+                        px={2}
+                        as={RouterLink}
+                        to="/profile"
+                    >
                         <Avatar size="xs" src="" name="Jon Doe" mr={2} /> Jon
                     </Button>
                     <Menu>
@@ -46,7 +52,9 @@ const NavBar = ({ ...props }: BoxProps) => {
                             icon={<AiFillCaretDown />}
                         ></MenuButton>
                         <MenuList>
-                            <MenuItem>Profile</MenuItem>
+                            <MenuItem as={RouterLink} to="/profile">
+                                Profile
+                            </MenuItem>
                             <MenuItem>Log Out</MenuItem>
                         </MenuList>
                     </Menu>

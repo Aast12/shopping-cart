@@ -20,8 +20,10 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import Card from '../components/Card';
 import { ValidatedInput } from '../components/FormComponents';
+import { setUser } from '../redux/slices/user';
 import { User } from '../types/Users';
 
 type SignUpData = Omit<User, 'profilePicture' | '_id' | 'orders'> & {
@@ -137,6 +139,7 @@ const SignUpModal = ({
 
 const Landing = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const dispatch = useDispatch();
     const methods = useForm<Pick<User, 'email'> & { password: string }>();
 
     const onSubmit = (values: Pick<User, 'email'> & { password: string }) => {
@@ -150,6 +153,7 @@ const Landing = () => {
                     .get('/users')
                     .then((res) => {
                         console.log('!!!!', res);
+                        dispatch(setUser(res.data as User));
                     })
                     .catch((err) => {
                         console.error(err);

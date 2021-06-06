@@ -1,5 +1,4 @@
 import express, { Request } from 'express';
-import Product from '../models/Product';
 
 import { createImage } from '../services/media';
 import { upload } from '../services/multer';
@@ -14,21 +13,6 @@ router.route('/').get(requireLogin, async (req: Request, res) => {
 
     console.log('->', user);
     res.status(200).send(user);
-});
-
-router.get('/create', upload.single('image'), async (req, res) => {
-    try {
-        const newUser = new User(req.body);
-
-        if (req.file) {
-            newUser.profilePicture = createImage(req.file);
-        }
-
-        await newUser.save();
-        res.sendStatus(200);
-    } catch (err) {
-        res.status(500).send(err);
-    }
 });
 
 router.post('/create', upload.single('image'), async (req, res) => {
@@ -46,11 +30,14 @@ router.post('/create', upload.single('image'), async (req, res) => {
     }
 });
 
-router.put('/:id', upload.single('image'), async (req, res) => {
+router.put('/:id', upload.single('profilePicture'), async (req, res) => {
     try {
         const { ...values } = req.body;
 
+        console.log(req.file);
+
         if (req.file) {
+            console.log('XD');
             await User.updateOne(
                 { _id: req.params.id },
                 {
@@ -59,7 +46,8 @@ router.put('/:id', upload.single('image'), async (req, res) => {
                 }
             );
         } else {
-            await Product.updateOne({ _id: req.params.id }, values);
+            console.log('WASASTT');
+            await User.updateOne({ _id: req.params.id }, values);
         }
 
         res.sendStatus(200);

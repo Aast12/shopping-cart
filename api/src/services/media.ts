@@ -11,7 +11,7 @@ export const createImage = (
 } => {
     return {
         data: fs.readFileSync(
-            filepath ?? path.join(__dirname, '..', 'uploads', filename)
+            filepath ?? path.join(__dirname, '..', '..', 'uploads', filename)
         ),
         contentType: mimetype,
     };

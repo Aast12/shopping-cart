@@ -1,10 +1,9 @@
 import multer from 'multer';
 
 const storage = multer.diskStorage({
-    destination: (_, __, callback) => {
-        callback(null, 'uploads');
-    },
+    destination: 'uploads/',
     filename: (_, file, callback) => {
+        console.log(file.fieldname);
         callback(null, file.fieldname + '-' + Date.now());
     },
 });
