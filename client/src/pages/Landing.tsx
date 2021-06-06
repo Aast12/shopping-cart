@@ -18,9 +18,16 @@ import {
     useDisclosure,
     VStack,
 } from '@chakra-ui/react';
-import { useForm } from 'react-hook-form';
+import axios from 'axios';
+import { FormProvider, useForm } from 'react-hook-form';
 import Card from '../components/Card';
+import { ValidatedInput } from '../components/FormComponents';
 import { User } from '../types/Users';
+
+type SignUpData = Omit<User, 'profilePicture' | '_id' | 'orders'> & {
+    password: string;
+    passwordConfirmation: string;
+};
 
 const SignUpModal = ({
     isOpen,
@@ -29,93 +36,98 @@ const SignUpModal = ({
     isOpen: boolean;
     onClose: () => void;
 }) => {
-    const { handleSubmit, register, setValue, watch } =
-        useForm<
-            Omit<User, 'profilePicture' | '_id' | 'orders'> & {
-                passwordConfirmation: string;
-            }
-        >();
+    const methods = useForm<SignUpData>();
 
-    const onSubmit = (
-        values: Omit<User, 'profilePicture' | '_id' | 'orders'> & {
-            passwordConfirmation: string;
-        }
-    ) => {
+    const {
+        handleSubmit,
+        watch,
+        formState: { errors },
+    } = methods;
+
+    const onSubmit = (values: SignUpData) => {
         console.log(values);
+
+        axios
+            .post('/users/create', values)
+            .then((res) => {
+                console.log(res);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
     };
 
     return (
-        <Modal
-            // finalFocusRef={finalRef}
-            isOpen={isOpen}
-            onClose={onClose}
-        >
+        <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Sign Up</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <VStack align="start" spacing={3}>
-                            <Stack w="100%" direction={['column', 'row']}>
-                                <Input
-                                    placeholder="Given Name"
-                                    {...register('givenName', {
+                    <FormProvider {...methods}>
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <VStack align="start" spacing={3}>
+                                <Stack w="100%" direction={['column', 'row']}>
+                                    <ValidatedInput
+                                        placeholder="Given Name"
+                                        field={'givenName'}
+                                        registerOptions={{
+                                            required: 'This is required',
+                                        }}
+                                    />
+                                    <ValidatedInput
+                                        placeholder="Last Name"
+                                        field={'lastName'}
+                                        registerOptions={{
+                                            required: 'This is required',
+                                        }}
+                                    />
+                                </Stack>
+                                <ValidatedInput
+                                    placeholder="Email"
+                                    type="email"
+                                    field={'email'}
+                                    registerOptions={{
+                                        required: 'This is required',
+                                    }}
+                                />
+                                <ValidatedInput
+                                    placeholder="Password"
+                                    type="password"
+                                    field={'password'}
+                                    registerOptions={{
                                         required: 'This is required',
                                         minLength: {
-                                            value: 4,
+                                            value: 6,
                                             message:
-                                                'Minimum length should be 4',
+                                                'Minimum length should be 6',
                                         },
-                                    })}
+                                    }}
                                 />
-                                <Input
-                                    placeholder="Last Name"
-                                    {...register('lastName', {
+                                <ValidatedInput
+                                    placeholder="Confirm Password"
+                                    type="password"
+                                    field={'passwordConfirmation'}
+                                    registerOptions={{
                                         required: 'This is required',
-                                        minLength: {
-                                            value: 4,
-                                            message:
-                                                'Minimum length should be 4',
-                                        },
-                                    })}
+                                        validate: (val) =>
+                                            val === watch('password'),
+                                    }}
+                                    customError={
+                                        errors.passwordConfirmation &&
+                                        errors.passwordConfirmation.type ===
+                                            'validate' && (
+                                            <span>Passwords must match</span>
+                                        )
+                                    }
                                 />
-                            </Stack>
-                            <Input
-                                placeholder="Email"
-                                {...register('email', {
-                                    required: 'This is required',
-                                    minLength: {
-                                        value: 4,
-                                        message: 'Minimum length should be 4',
-                                    },
-                                })}
-                            />
-                            <Input
-                                placeholder="Password"
-                                {...register('password', {
-                                    required: 'This is required',
-                                    minLength: {
-                                        value: 8,
-                                        message: 'Minimum length should be 8',
-                                    },
-                                })}
-                                type="password"
-                            />
-                            <Input
-                                placeholder="Confirm Password"
-                                {...register('passwordConfirmation', {
-                                    required: 'This is required',
-                                    validate: (val) =>
-                                        val === watch('password'),
-                                })}
-                                type="password"
-                            />
-                            <Button w="100%" type="submit">
-                                Sign Up
-                            </Button>
-                        </VStack>
-                    </form>
+
+                                <Button w="100%" type="submit">
+                                    Sign Up
+                                </Button>
+                            </VStack>
+                        </form>
+                    </FormProvider>
                 </ModalBody>
                 <ModalFooter></ModalFooter>
             </ModalContent>
@@ -125,7 +137,28 @@ const SignUpModal = ({
 
 const Landing = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const { handleSubmit, register, setValue } = useForm<User>();
+    const methods = useForm<Pick<User, 'email'> & { password: string }>();
+
+    const onSubmit = (values: Pick<User, 'email'> & { password: string }) => {
+        console.log(values);
+
+        axios
+            .post('/login', values)
+            .then((res) => {
+                console.log(res);
+                axios
+                    .get('/users')
+                    .then((res) => {
+                        console.log('!!!!', res);
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    });
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    };
 
     return (
         <Box>
@@ -138,28 +171,49 @@ const Landing = () => {
                     <Heading>Shopping Cart</Heading>
                 </Center>
                 <Center>
-                    <Card minW="md">
-                        <VStack align="start" spacing={3}>
-                            <Heading>Log In</Heading>
-                            <Input placeholder="email" />
-                            <Input placeholder="password" type="password" />
-                            <Button w="100%">Log In</Button>
-                            <Flex
-                                direction={['column', 'row']}
-                                justifyContent="space-between"
-                                w="100%"
-                            >
-                                <Link color="blue.300" mt={0} fontSize="sm">
-                                    Forgot password?
+                    <Card w="md">
+                        <Heading mb={4}>Log In</Heading>
+                        <FormProvider {...methods}>
+                            <form onSubmit={methods.handleSubmit(onSubmit)}>
+                                <VStack align="start" spacing={3}>
+                                    <ValidatedInput
+                                        placeholder="Email"
+                                        type="email"
+                                        field={'email'}
+                                        registerOptions={{
+                                            required: 'This is required',
+                                        }}
+                                    />
+                                    <ValidatedInput
+                                        placeholder="Password"
+                                        type="password"
+                                        field={'password'}
+                                        registerOptions={{
+                                            required: 'This is required',
+                                        }}
+                                    />
+                                    <Button w="100%" type="submit">
+                                        Log In
+                                    </Button>
+                                </VStack>
+                            </form>
+                        </FormProvider>
+                        <Flex
+                            direction={['column', 'row']}
+                            justifyContent="space-between"
+                            w="100%"
+                            my={2}
+                        >
+                            <Link color="blue.300" mt={0} fontSize="sm">
+                                Forgot password?
+                            </Link>
+                            <Text fontSize="sm">
+                                Not registered yet?{' '}
+                                <Link color="blue.300" onClick={onOpen}>
+                                    Sign Up
                                 </Link>
-                                <Text fontSize="sm">
-                                    Not registered yet?{' '}
-                                    <Link color="blue.300" onClick={onOpen}>
-                                        Sign Up
-                                    </Link>
-                                </Text>
-                            </Flex>
-                        </VStack>
+                            </Text>
+                        </Flex>
                         <SignUpModal isOpen={isOpen} onClose={onClose} />
                     </Card>
                 </Center>

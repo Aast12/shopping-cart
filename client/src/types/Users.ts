@@ -16,7 +16,7 @@ export type User = {
     lastName: string;
     dateOfBirth?: Date;
     email: string;
-    password: string;
+    // password: string;
     profilePicture?: {
         data: Buffer;
         contentType: string;
