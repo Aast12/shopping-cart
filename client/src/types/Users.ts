@@ -16,10 +16,12 @@ export type User = {
     dateOfBirth?: string;
     email: string;
     // password: string;
-    profilePicture?: {
-        data: Buffer;
-        contentType: string;
-    };
+    profilePicture?:
+        | {
+              data: Buffer;
+              contentType: string;
+          }
+        | string;
     orders?: Order[];
     role: 'admin' | 'user';
     createdAt: string;

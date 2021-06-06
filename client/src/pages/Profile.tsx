@@ -8,6 +8,10 @@ import {
     Container,
     Divider,
     Flex,
+    FormControl,
+    FormErrorMessage,
+    FormLabel,
+    FormLabelProps,
     Heading,
     IconButton,
     Input,
@@ -19,15 +23,16 @@ import axios from 'axios';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
     FileUpload,
     ValidatedInput,
     ValidatedInputProps,
 } from '../components/FormComponents';
+import { setUser } from '../redux/slices/user';
 import { RootState } from '../redux/store';
 import { User } from '../types/Users';
-import { objToFormData } from '../utils';
+import { objToFormData, toBase64 } from '../utils';
 
 type UserPayload = Omit<
     User,
@@ -38,6 +43,7 @@ const castInputProps = (values: ValidatedInputProps<UserPayload>) => values;
 
 const Profile = () => {
     const { user } = useSelector((state: RootState) => state.user);
+    const dispatch = useDispatch();
     const [editing, setEditing] = useBoolean(false);
     const methods = useForm<UserPayload>();
     const { register, watch, control } = methods;
@@ -46,7 +52,6 @@ const Profile = () => {
         useState<string | ArrayBuffer | null>(null);
 
     const onSubmit = (values: UserPayload) => {
-        console.log(values);
         if (user) {
             const { profilePicture, ...tmp } = values;
             const payload: Omit<UserPayload, 'profilePicture'> & {
@@ -59,7 +64,19 @@ const Profile = () => {
 
             axios
                 .put(`/users/${user?._id}`, objToFormData(payload))
-                .then(console.log)
+                .then(async () => {
+                    const { profilePicture, ...usedValues } = values;
+                    let newUserData = { ...user, ...usedValues };
+                    if (profilePicture && profilePicture.length > 0) {
+                        const b64Picture = await toBase64(profilePicture[0]);
+                        if (typeof b64Picture === 'string') {
+                            newUserData.profilePicture = b64Picture;
+                        }
+                    }
+
+                    dispatch(setUser(newUserData));
+                    setEditing.off();
+                })
                 .catch(console.error);
         }
     };
@@ -67,6 +84,7 @@ const Profile = () => {
     useEffect(() => {
         const { setValue } = methods;
         if (user && !editing) {
+            console.log(user);
             user?.dateOfBirth &&
                 setValue(
                     'dateOfBirth',
@@ -75,10 +93,16 @@ const Profile = () => {
             setValue('givenName', user.givenName);
             setValue('lastName', user.lastName);
             setValue('email', user.email);
-            user?.profilePicture?.data &&
-                setProfilePicSrc(
-                    `data:${user.profilePicture.contentType};base64,${user.profilePicture.data}`
-                );
+            if (user?.profilePicture) {
+                if (typeof user?.profilePicture === 'string') {
+                    setProfilePicSrc(user?.profilePicture);
+                } else {
+                    user?.profilePicture?.data &&
+                        setProfilePicSrc(
+                            `data:${user.profilePicture.contentType};base64,${user.profilePicture.data}`
+                        );
+                }
+            }
         }
     }, [editing, user, methods]);
 
@@ -92,6 +116,12 @@ const Profile = () => {
             };
         }
     }, [profilePictureValue]);
+
+    const labelProps: FormLabelProps = {
+        textTransform: 'uppercase',
+        fontWeight: 'bold',
+        fontSize: 'xs',
+    };
 
     if (!user) return <Text>You are not logged in</Text>;
 
@@ -116,7 +146,7 @@ const Profile = () => {
                         </ButtonGroup>
                     </Flex>
                     <Divider my={2} />
-                    <Stack py={4}>
+                    <Stack py={4} spacing={8}>
                         <Center mb={4}>
                             <Box pos="relative" w="fit-content">
                                 <Avatar
@@ -153,6 +183,8 @@ const Profile = () => {
                                 isDisabled={!editing}
                                 variant="flushed"
                                 placeholder="Given Name"
+                                label="Given Name"
+                                labelProps={labelProps}
                                 {...castInputProps({
                                     field: 'givenName',
                                     registerOptions: {
@@ -164,6 +196,8 @@ const Profile = () => {
                                 isDisabled={!editing}
                                 variant="flushed"
                                 placeholder="Last Name"
+                                label="Last Name"
+                                labelProps={labelProps}
                                 {...castInputProps({
                                     field: 'lastName',
                                     registerOptions: {
@@ -177,6 +211,8 @@ const Profile = () => {
                             variant="flushed"
                             placeholder="Email"
                             type="email"
+                            label="Email"
+                            labelProps={labelProps}
                             {...castInputProps({
                                 field: 'email',
                                 registerOptions: {
@@ -188,15 +224,33 @@ const Profile = () => {
                             control={control}
                             name="dateOfBirth"
                             render={(props) => (
-                                <Input
-                                    variant="flushed"
-                                    type="date"
-                                    placeholderText="Date of birth"
-                                    onChange={(e) => {
-                                        props.field.onChange(e.target.value);
-                                    }}
-                                    value={props.field.value ?? ''}
-                                />
+                                <FormControl
+                                    isRequired
+                                    isInvalid={
+                                        props.fieldState.error ? true : false
+                                    }
+                                >
+                                    <FormLabel {...labelProps}>
+                                        Date of Birth
+                                    </FormLabel>
+
+                                    <Input
+                                        isDisabled={!editing}
+                                        variant="flushed"
+                                        type="date"
+                                        placeholderText="Date of birth"
+                                        onChange={(e) => {
+                                            props.field.onChange(
+                                                e.target.value
+                                            );
+                                        }}
+                                        value={props.field.value ?? ''}
+                                    />
+                                    <FormErrorMessage>
+                                        {props.fieldState.error &&
+                                            props.fieldState.error.message}
+                                    </FormErrorMessage>
+                                </FormControl>
                             )}
                         />
                     </Stack>

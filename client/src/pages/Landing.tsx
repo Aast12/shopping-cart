@@ -21,8 +21,11 @@ import {
 import axios from 'axios';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import Card from '../components/Card';
 import { ValidatedInput } from '../components/FormComponents';
+import useAuth from '../hooks/useAuth';
+import useUser from '../hooks/useUser';
 import { setUser } from '../redux/slices/user';
 import { User } from '../types/Users';
 
@@ -47,8 +50,6 @@ const SignUpModal = ({
     } = methods;
 
     const onSubmit = (values: SignUpData) => {
-        console.log(values);
-
         axios
             .post('/users/create', values)
             .then((res) => {
@@ -139,30 +140,16 @@ const SignUpModal = ({
 
 const Landing = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
+    const { loginUser, error } = useAuth();
+    const { user } = useUser();
     const methods = useForm<Pick<User, 'email'> & { password: string }>();
 
     const onSubmit = (values: Pick<User, 'email'> & { password: string }) => {
-        console.log(values);
-
-        axios
-            .post('/login', values)
-            .then((res) => {
-                console.log(res);
-                axios
-                    .get('/users')
-                    .then((res) => {
-                        console.log('!!!!', res);
-                        dispatch(setUser(res.data as User));
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                    });
-            })
-            .catch((err) => {
-                console.error(err);
-            });
+        loginUser(values);
     };
+
+    if (user) return <Redirect to="/" />;
 
     return (
         <Box>

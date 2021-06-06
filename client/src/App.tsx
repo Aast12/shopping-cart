@@ -6,6 +6,7 @@ import Products from './pages/admin/Products';
 import Profile from './pages/Profile';
 import { Provider } from 'react-redux';
 import store from './redux/store';
+import PrivateRoute from './components/ProtectedRoute';
 
 function App() {
     return (
@@ -14,9 +15,10 @@ function App() {
                 <Router>
                     <NavBar />
                     <Switch>
-                        <Route path="/products" component={Products} />
-                        <Route path="/profile" component={Profile} />
-                        <Route path="/" component={Landing} />
+                        {/* <Route path="/products" component={Products} /> */}
+                        <PrivateRoute exact path="/" component={Products} />
+                        <PrivateRoute path="/profile" component={Profile} />
+                        <Route path="/login" component={Landing} />
                     </Switch>
                 </Router>
             </Provider>

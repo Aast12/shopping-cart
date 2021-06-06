@@ -16,8 +16,11 @@ import {
 import { AiOutlineShoppingCart, AiFillCaretDown } from 'react-icons/ai';
 
 import { Link as RouterLink } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
 
 const NavBar = ({ ...props }: BoxProps) => {
+    const { logOut } = useAuth();
+
     return (
         <Box py={3} w="100%" borderBottomWidth={1}>
             <Flex alignItems="center" justifyContent="space-around" w="100%">
@@ -55,7 +58,7 @@ const NavBar = ({ ...props }: BoxProps) => {
                             <MenuItem as={RouterLink} to="/profile">
                                 Profile
                             </MenuItem>
-                            <MenuItem>Log Out</MenuItem>
+                            <MenuItem onClick={logOut}>Log Out</MenuItem>
                         </MenuList>
                     </Menu>
                 </HStack>

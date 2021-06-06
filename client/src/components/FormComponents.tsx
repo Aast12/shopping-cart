@@ -1,6 +1,8 @@
 import {
     FormControl,
     FormErrorMessage,
+    FormLabel,
+    FormLabelProps,
     Input,
     InputGroup,
     InputProps,
@@ -16,12 +18,16 @@ export type ValidatedInputProps<T> = {
     registerOptions: RegisterOptions;
     field: keyof T;
     customError?: React.ReactNode;
+    label?: string;
+    labelProps?: FormLabelProps;
 } & InputProps;
 
 export const ValidatedInput = <T,>({
     registerOptions,
     field,
     customError,
+    label,
+    labelProps = {},
     ...props
 }: ValidatedInputProps<T>) => {
     const {
@@ -30,6 +36,7 @@ export const ValidatedInput = <T,>({
     } = useFormContext<T>();
     return (
         <FormControl isRequired isInvalid={errors[field] ? true : false}>
+            {label && <FormLabel {...labelProps}>{label}</FormLabel>}
             <Input
                 {...props}
                 // @ts-ignore

@@ -47,7 +47,6 @@ const main = async () => {
     app.post('/login', async (req, res) => {
         let { email, password } = req.body;
         let user = await UserModel.findOne({ email: email });
-        console.log('FOUND', user);
 
         if (user) {
             let success = bcrypt.compareSync(password, user.password);
@@ -62,6 +61,16 @@ const main = async () => {
             res.status(404).send('Invalid credentials');
         }
     });
+
+    app.get('/logout', async (_, res) => {
+        try {
+            res.clearCookie('authorization');
+            res.sendStatus(200);
+        } catch (err) {
+            res.sendStatus(201);
+        }
+    });
+
     app.use('/', (_, res) => {
         res.send('Hello!');
     });

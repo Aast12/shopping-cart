@@ -1,16 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Product } from '../types/Products';
 import axios from 'axios';
-
-const toBase64 = (file: File) =>
-    new Promise(
-        (resolve: (value: string | ArrayBuffer | null) => void, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = (error) => reject(error);
-        }
-    );
+import { toBase64 } from '../utils';
 
 const useProducts = () => {
     const [loading, setLoading] = useState<boolean>(true);

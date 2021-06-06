@@ -1,17 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
 import { UserToken } from './types';
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 
 const secret = '5tr0n6P@55W0rD';
 
 // middleware that add the user
-export function requireLogin(req: Request, _: Response, next: NextFunction) {
+export function requireLogin(req: Request, res: Response, next: NextFunction) {
     let accessToken = req.cookies.authorization;
     // if there is no token stored in cookies, the request is unauthorized
     if (!accessToken) {
-        console.log('Unauthorized user, redirecting to login');
-        // return res.redirect('/login');
-        next();
+        console.log('Unauthorized user');
+        return res.sendStatus(401);
     }
 
     try {
@@ -24,8 +23,8 @@ export function requireLogin(req: Request, _: Response, next: NextFunction) {
     } catch (e) {
         console.error(e);
         //if an error occured return request unauthorized error, or redirect to login
-        // return res.status(401).send():
-        // res.redirect(403, '/login');
+        return res.sendStatus(401);
     }
-    next();
+
+    return next();
 }
