@@ -14,23 +14,31 @@ const useShoppingCart = () => {
     const toast = useToast();
     const { products } = useSelector((state: RootState) => state.cart);
 
-    const toggle = (id: string) => {
-        toast({
-            description: 'Your shopping cart was modified',
-            status: 'info',
-            duration: 1000,
-            position: 'bottom-right',
-        });
+    const toggle = (id: string, ignoreToast: boolean = false) => {
+        if (!ignoreToast) {
+            toast({
+                description: 'Your shopping cart was modified',
+                status: 'info',
+                duration: 1000,
+                position: 'bottom-right',
+            });
+        }
         dispatch(toggleProduct({ id }));
     };
 
-    const add = (id: string, quantity: number) => {
-        toast({
-            description: 'The product has been added to your cart',
-            status: 'info',
-            duration: 1000,
-            position: 'bottom-right',
-        });
+    const add = (
+        id: string,
+        quantity: number,
+        ignoreToast: boolean = false
+    ) => {
+        if (!ignoreToast) {
+            toast({
+                description: 'The product has been added to your cart',
+                status: 'info',
+                duration: 1000,
+                position: 'bottom-right',
+            });
+        }
         dispatch(addProduct({ id, quantity }));
     };
 
