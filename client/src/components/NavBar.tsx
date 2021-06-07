@@ -13,13 +13,29 @@ import {
     MenuItem,
     MenuList,
 } from '@chakra-ui/react';
+import { useMemo } from 'react';
 import { AiOutlineShoppingCart, AiFillCaretDown } from 'react-icons/ai';
 
 import { Link as RouterLink } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
+import useUser from '../hooks/useUser';
 
 const NavBar = ({ ...props }: BoxProps) => {
     const { logOut } = useAuth();
+    const { user } = useUser();
+
+    const pictureSrc = useMemo(() => {
+        if (!user?.profilePicture) return '';
+        if (typeof user?.profilePicture === 'string') {
+            return user?.profilePicture;
+        } else if (user?.profilePicture?.data) {
+            return `data:${user.profilePicture.contentType};base64,${user.profilePicture.data}`;
+        }
+
+        return '';
+    }, [user]);
+
+    if (!user) return null;
 
     return (
         <Box py={3} w="100%" borderBottomWidth={1}>
@@ -44,7 +60,13 @@ const NavBar = ({ ...props }: BoxProps) => {
                         as={RouterLink}
                         to="/profile"
                     >
-                        <Avatar size="xs" src="" name="Jon Doe" mr={2} /> Jon
+                        <Avatar
+                            size="xs"
+                            src={pictureSrc}
+                            name={`${user.givenName} ${user.lastName}`}
+                            mr={2}
+                        />{' '}
+                        {user.givenName}
                     </Button>
                     <Menu>
                         <MenuButton

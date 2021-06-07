@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Product } from '../types/Products';
+import { Product } from '../types/Product';
 import axios from 'axios';
 import { toBase64 } from '../utils';
 
@@ -27,7 +27,6 @@ const useProducts = () => {
         axios
             .delete('http://localhost:5000/products/delete', { data: { id } })
             .then((res) => {
-                console.log(res);
                 setProducts(products.filter((p) => p._id !== id));
             })
             .catch(console.error);
@@ -72,11 +71,9 @@ const useProducts = () => {
     useEffect(() => {
         fetch('http://localhost:5000/products')
             .then((res) => {
-                console.log(res);
                 return res.json();
             })
             .then((res) => {
-                console.log(res);
                 setProducts(res);
             })
             .catch((err) => setError(err))

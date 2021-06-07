@@ -84,7 +84,6 @@ const Profile = () => {
     useEffect(() => {
         const { setValue } = methods;
         if (user && !editing) {
-            console.log(user);
             user?.dateOfBirth &&
                 setValue(
                     'dateOfBirth',

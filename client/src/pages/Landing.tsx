@@ -52,9 +52,7 @@ const SignUpModal = ({
     const onSubmit = (values: SignUpData) => {
         axios
             .post('/users/create', values)
-            .then((res) => {
-                console.log(res);
-            })
+            .then((res) => {})
             .catch((err) => {
                 console.error(err);
             });
