@@ -5,8 +5,6 @@ import {
     Center,
     Container,
     Flex,
-    FormControl,
-    FormLabel,
     Input,
     Text,
     Textarea,
@@ -17,12 +15,23 @@ import {
     useBreakpointValue,
     Select,
     ButtonGroup,
+    Image,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
-import { Product } from '../../types/Products';
-import { useForm } from 'react-hook-form';
+import { Product } from '../../types/Product';
+import { FormProvider, useForm } from 'react-hook-form';
 import useProducts from '../../hooks/useProducts';
+import {
+    FileUpload,
+    ValidatedInput,
+    ValidatedInputProps,
+} from '../../components/FormComponents';
+import { toBase64 } from '../../utils';
+
+const castInputProps = (
+    values: ValidatedInputProps<Product & { image: FileList }>
+) => values;
 
 const Products = () => {
     const { products, del, edit, create } = useProducts();
@@ -30,8 +39,11 @@ const Products = () => {
 
     const [selected, setSelected] = useState<Product | undefined>();
     const [adding, setAdding] = useState<boolean>(false);
-    const { handleSubmit, register, setValue } =
-        useForm<Product & { image: FileList }>();
+    const methods = useForm<Omit<Product, 'image'> & { image: FileList }>();
+    const { handleSubmit, register, setValue, watch } = methods;
+    const [imageValue] = watch(['image']);
+    const [imageSrc, setImageSrc] = useState<string | ArrayBuffer | null>(null);
+
     const isCompact = useBreakpointValue({ base: true, md: false });
 
     const onSubmit = ({
@@ -55,6 +67,29 @@ const Products = () => {
         }
     };
 
+    useEffect(() => {
+        if (selected?.image) {
+            // const b64Picture = await toBase64(profilePicture[0]);
+            // if (typeof b64Picture === 'string') {
+            //     newUserData.profilePicture = b64Picture;
+            // }
+            setImageSrc(
+                `data:${selected.image.contentType};base64,${selected.image.data}`
+            );
+        }
+    }, [selected]);
+
+    useEffect(() => {
+        if (imageValue && imageValue.length > 0) {
+            const file = imageValue[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = function (e) {
+                setImageSrc(reader.result);
+            };
+        }
+    }, [imageValue]);
+
     const setValues = (values: Product) => {
         setValue('name', values.name);
         setValue('price', values.price);
@@ -71,7 +106,7 @@ const Products = () => {
     };
 
     return (
-        <Container maxW="container.lg" py={4}>
+        <Container maxW="container.lg" py={8}>
             <Heading lineHeight="tall">Products</Heading>
             <hr />
             <Flex my={2} direction={isCompact ? 'column' : 'row'}>
@@ -170,120 +205,105 @@ const Products = () => {
                 <Box px={2} flex="1">
                     {selected ? (
                         <Box>
-                            <form onSubmit={handleSubmit(onSubmit)}>
-                                <FormControl>
-                                    <FormLabel htmlFor="name">Name</FormLabel>
-                                    <Input
-                                        id="name"
-                                        type="text"
-                                        placeholder="Name"
-                                        {...register('name', {
-                                            required: 'This is required',
-                                            minLength: {
-                                                value: 4,
-                                                message:
-                                                    'Minimum length should be 4',
-                                            },
-                                        })}
-                                    />
-                                </FormControl>
+                            <FormProvider {...methods}>
+                                <form onSubmit={handleSubmit(onSubmit)}>
+                                    <VStack align="start">
+                                        <ValidatedInput
+                                            label="Name"
+                                            placeholder="Name"
+                                            {...castInputProps({
+                                                field: 'name',
+                                                registerOptions: {
+                                                    required:
+                                                        'This is required',
+                                                },
+                                            })}
+                                        />
+                                        <ValidatedInput
+                                            label="Price"
+                                            type="number"
+                                            placeholder="Price"
+                                            {...castInputProps({
+                                                field: 'price',
+                                                registerOptions: {
+                                                    required:
+                                                        'This is required',
+                                                    min: {
+                                                        message:
+                                                            'Minimum value should be 0',
+                                                        value: 0,
+                                                    },
+                                                },
+                                            })}
+                                        />
+                                        <ValidatedInput
+                                            label="Description"
+                                            placeholder="Description"
+                                            type="textarea"
+                                            {...castInputProps({
+                                                field: 'description',
+                                                registerOptions: {
+                                                    required:
+                                                        'This is required',
+                                                },
+                                            })}
+                                        />
 
-                                <FormControl isRequired>
-                                    <FormLabel htmlFor="price">Price</FormLabel>
-                                    <Input
-                                        id="price"
-                                        type="number"
-                                        placeholder="Price"
-                                        min="0"
-                                        {...register('price', {
-                                            required: 'This is required',
-                                            min: {
-                                                message:
-                                                    'Minimum value should be 0',
-                                                value: 0,
-                                            },
-                                        })}
-                                    />
-                                </FormControl>
+                                        <Image
+                                            src={
+                                                typeof imageSrc === 'string'
+                                                    ? imageSrc
+                                                    : ''
+                                            }
+                                            alt={selected.name}
+                                        />
 
-                                <FormControl isRequired>
-                                    <FormLabel htmlFor="description">
-                                        Description
-                                    </FormLabel>
-                                    <Textarea
-                                        id="description"
-                                        placeholder="Description"
-                                        {...register('description', {
-                                            required: 'This is required',
-                                            minLength: {
-                                                value: 4,
-                                                message:
-                                                    'Minimum length should be 4',
-                                            },
-                                        })}
-                                    />
-                                </FormControl>
-                                <FormControl>
-                                    <FormLabel htmlFor="image">Image</FormLabel>
-                                    <Input
-                                        id="image"
-                                        type="file"
-                                        {...register('image', {})}
-                                    />
-                                </FormControl>
-
-                                {/* <div className="flex flex-wrap">
-                                <div style="width: 250px">
-                                    <label for="image" className="form-label">
-                                        Image
-                                    </label>
-                                    <input
-                                        className="form-control"
-                                        type="file"
-                                        id="image"
-                                        value=""
-                                    />
-                                </div>
-
-                                <img
-                                    className="hidden product-image mx-auto"
-                                    src=""
-                                    style="max-height: 200px"
-                                />
-                            </div> */}
-                                <Box my={2} float="right">
-                                    {!adding ? (
-                                        <ButtonGroup>
-                                            <Button
-                                                onClick={() =>
-                                                    selected?._id &&
-                                                    del(selected._id)
-                                                }
-                                                colorScheme="red"
+                                        <Flex my={2} w="100%">
+                                            <FileUpload
+                                                accept="image/*"
+                                                register={register('image', {})}
                                             >
-                                                Delete
-                                            </Button>
-                                            <Button
-                                                colorScheme="green"
-                                                // onClick={() => {
-                                                //     // Submit
-                                                // }}
-                                                type="submit"
-                                            >
-                                                Update
-                                            </Button>
-                                        </ButtonGroup>
-                                    ) : (
-                                        <Button
-                                            type="submit"
-                                            colorScheme="green"
-                                            // onClick={() => {}}
-                                        >
-                                            Create
-                                        </Button>
-                                    )}
-                                </Box>
-                            </form>
+                                                <Button
+                                                    variant="outline"
+                                                    colorScheme="blackAlpha"
+                                                >
+                                                    Edit image
+                                                </Button>
+                                            </FileUpload>
+                                            {!adding ? (
+                                                <ButtonGroup>
+                                                    <Button
+                                                        onClick={() =>
+                                                            selected?._id &&
+                                                            del(selected._id)
+                                                        }
+                                                        colorScheme="red"
+                                                    >
+                                                        Delete
+                                                    </Button>
+                                                    <Button
+                                                        colorScheme="green"
+                                                        // onClick={() => {
+                                                        //     // Submit
+                                                        // }}
+                                                        type="submit"
+                                                    >
+                                                        Update
+                                                    </Button>
+                                                </ButtonGroup>
+                                            ) : (
+                                                <Button
+                                                    type="submit"
+                                                    colorScheme="green"
+                                                    // onClick={() => {}}
+                                                >
+                                                    Create
+                                                </Button>
+                                            )}
+                                        </Flex>
+                                    </VStack>
+                                </form>
+                            </FormProvider>
                         </Box>
                     ) : (
                         <Center>
