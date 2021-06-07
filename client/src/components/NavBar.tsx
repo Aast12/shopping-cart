@@ -41,7 +41,7 @@ const NavBar = ({ ...props }: BoxProps) => {
     if (!user) return null;
 
     return (
-        <Box py={3} w="100%" borderBottomWidth={1}>
+        <Box py={3} w="100%" borderBottomWidth={1} bgColor="teal" color="white">
             <Flex alignItems="center" justifyContent="space-around" w="100%">
                 <Heading size="md" mx={3} as={RouterLink} to="/">
                     Shopping
@@ -52,6 +52,12 @@ const NavBar = ({ ...props }: BoxProps) => {
                     </Link>
                     <Box position="relative">
                         <IconButton
+                            _hover={{
+                                color: 'teal.500',
+                                bgColor: 'whiteAlpha.900',
+                            }}
+                            as={RouterLink}
+                            to="/cart"
                             variant="ghost"
                             borderRadius="full"
                             aria-label="shopping cart"
@@ -71,6 +77,10 @@ const NavBar = ({ ...props }: BoxProps) => {
                         )}
                     </Box>
                     <Button
+                        _hover={{
+                            color: 'teal.500',
+                            bgColor: 'whiteAlpha.900',
+                        }}
                         variant="ghost"
                         rounded="full"
                         px={2}
@@ -87,13 +97,21 @@ const NavBar = ({ ...props }: BoxProps) => {
                     </Button>
                     <Menu>
                         <MenuButton
+                            _hover={{
+                                color: 'teal.500',
+                                bgColor: 'whiteAlpha.900',
+                            }}
+                            _active={{
+                                color: 'teal.500',
+                                bgColor: 'whiteAlpha.900',
+                            }}
                             variant="ghost"
                             as={IconButton}
                             borderRadius="full"
                             aria-label="options"
                             icon={<AiFillCaretDown />}
                         ></MenuButton>
-                        <MenuList>
+                        <MenuList color="black">
                             <MenuItem as={RouterLink} to="/profile">
                                 Profile
                             </MenuItem>

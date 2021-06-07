@@ -2,13 +2,13 @@ import { Spinner } from '@chakra-ui/react';
 import { Route, Redirect } from 'react-router-dom';
 import useUser from '../hooks/useUser';
 
-export default function PrivateRoute(props) {
+export default function PrivateRoute({ role = 'user', ...props }) {
     const { user, isLoading } = useUser();
     const { component: Component, ...rest } = props;
 
     if (isLoading) return <Spinner />;
 
-    if (user)
+    if (user && user.role === role)
         return <Route {...rest} render={(props) => <Component {...props} />} />;
 
     return <Redirect to="/login" />;

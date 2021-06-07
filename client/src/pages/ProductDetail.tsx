@@ -34,7 +34,7 @@ const ProductDetail = () => {
     const [loading, setLoading] = useBoolean();
     const [product, setProduct] = useState<Product>();
     const [cartQuantity, setCartQuantity] = useState(1);
-    const { goBack } = useHistory();
+    const { push } = useHistory();
     const { add, getById, products } = useShoppingCart();
 
     const addToCart = () => {
@@ -69,10 +69,10 @@ const ProductDetail = () => {
     const compact = useBreakpointValue({ base: false, md: true });
 
     return (
-        <Container maxW="container.lg" my={4} mb={8}>
+        <Container maxW="container.lg" py={4} mb={8}>
             <Button
                 leftIcon={<ArrowBackIcon />}
-                onClick={goBack}
+                onClick={() => push('/')}
                 colorScheme="cyan"
                 variant="ghost"
             >
@@ -82,7 +82,13 @@ const ProductDetail = () => {
                 <Spinner />
             ) : (
                 product && (
-                    <Box borderWidth={1} my={4} p={4} borderRadius="lg">
+                    <Box
+                        borderWidth={1}
+                        my={4}
+                        p={4}
+                        borderRadius="lg"
+                        bgColor="white"
+                    >
                         <Box sx={{ '& > *': { d: 'inline' } }}>
                             <Heading mr={2}>{product?.name}</Heading>
                             {product.brand && (
