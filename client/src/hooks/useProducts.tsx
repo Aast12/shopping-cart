@@ -13,7 +13,7 @@ const useProducts = () => {
     const [error, setError] = useState<any>(null);
     const [products, setProducts] = useState<Product[]>([]);
 
-    const create = (values: ProductPostPayload) => {
+    const create = (values: Omit<ProductPostPayload, '_id'>) => {
         const form = new FormData();
         Object.keys(values).forEach((key) => {
             // @ts-ignore
@@ -48,6 +48,7 @@ const useProducts = () => {
             match = {
                 ...match,
                 ...newValues,
+                _id,
             };
 
             if (image && typeof imData === 'string') {

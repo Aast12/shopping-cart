@@ -28,9 +28,9 @@ const shoppingCartSlice = createSlice({
             );
 
             if (queryIdx !== undefined && queryIdx !== -1) {
-                state.products?.push(action.payload);
-            } else if (queryIdx) {
                 state.products[queryIdx] = action.payload;
+            } else if (queryIdx !== undefined) {
+                state.products?.push(action.payload);
             }
         },
         deleteProduct(state, action: PayloadAction<{ id: string }>) {

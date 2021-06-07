@@ -26,6 +26,7 @@ import {
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
+import useShoppingCart from '../hooks/useShoppingCart';
 import { Product } from '../types/Product';
 import { formatter } from '../utils';
 
@@ -34,15 +35,30 @@ const ProductDetail = () => {
     const toast = useToast();
     const [loading, setLoading] = useBoolean();
     const [product, setProduct] = useState<Product>();
+    const [cartQuantity, setCartQuantity] = useState(1);
     const { goBack } = useHistory();
+    const { add, getById, products } = useShoppingCart();
+
+    const addToCart = () => {
+        console.log('XD');
+        add(id, cartQuantity);
+    };
+
+    useEffect(() => {
+        console.log(products);
+    }, [products]);
 
     useEffect(() => {
         axios
             .get(`/products/${id}`)
             .then((res) => {
                 setLoading.off();
-                console.log(res.data as Product);
-                setProduct(res.data);
+                const data: Product = res.data;
+                setProduct(data);
+                const cartItem = getById(data._id);
+                if (cartItem) {
+                    setCartQuantity(cartItem.quantity);
+                }
             })
             .catch((err) => {
                 toast({
@@ -70,7 +86,18 @@ const ProductDetail = () => {
             ) : (
                 product && (
                     <Box borderWidth={1} my={4} p={4} borderRadius="lg">
-                        <Heading>{product?.name}</Heading>
+                        <Box sx={{ '& > *': { d: 'inline' } }}>
+                            <Heading mr={2}>{product?.name}</Heading>
+                            {product.brand && (
+                                <Heading
+                                    fontWeight="medium"
+                                    color="gray.500"
+                                    size="md"
+                                >
+                                    By {product.brand}
+                                </Heading>
+                            )}
+                        </Box>
                         <Stack direction={compact ? 'row' : 'column'} py={4}>
                             <Box
                                 height="md"
@@ -116,6 +143,10 @@ const ProductDetail = () => {
                                         <NumberInput
                                             size="sm"
                                             defaultValue={1}
+                                            value={cartQuantity}
+                                            onChange={(e) =>
+                                                setCartQuantity(parseInt(e))
+                                            }
                                             min={1}
                                         >
                                             <NumberInputField focusBorderColor="red.200" />
@@ -128,6 +159,7 @@ const ProductDetail = () => {
                                         <Button
                                             rounded="full"
                                             colorScheme="blue"
+                                            onClick={addToCart}
                                         >
                                             Add To Cart
                                         </Button>

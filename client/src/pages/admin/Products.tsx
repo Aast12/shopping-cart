@@ -57,14 +57,12 @@ const Products = () => {
 
         if (image && image.length > 0) payload.image = image[0];
 
-        console.log('brooo??', payload);
-
         if (adding) {
             create(payload);
         } else if (selected?._id) {
             edit({
-                _id: selected._id,
                 ...payload,
+                _id: selected._id,
             });
         }
     };
@@ -78,8 +76,16 @@ const Products = () => {
             setImageSrc(
                 `data:${selected.image.contentType};base64,${selected.image.data}`
             );
+        } else {
+            setImageSrc(null);
         }
     }, [selected]);
+
+    useEffect(() => {
+        if (adding) {
+            setImageSrc(null);
+        }
+    }, [adding]);
 
     useEffect(() => {
         if (imageValue && imageValue.length > 0) {
@@ -270,15 +276,16 @@ const Products = () => {
                                                 },
                                             })}
                                         />
-                                        <Image
-                                            src={
-                                                typeof imageSrc === 'string'
-                                                    ? imageSrc
-                                                    : ''
-                                            }
-                                            alt={selected.name}
-                                        />
-
+                                        {imageSrc && (
+                                            <Image
+                                                src={
+                                                    typeof imageSrc === 'string'
+                                                        ? imageSrc
+                                                        : ''
+                                                }
+                                                alt={selected.name}
+                                            />
+                                        )}
                                         <Flex my={2} w="100%">
                                             <FileUpload
                                                 accept="image/*"
