@@ -17,3 +17,8 @@ export const toBase64 = (file: File) =>
             reader.onerror = (error) => reject(error);
         }
     );
+
+export const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+});

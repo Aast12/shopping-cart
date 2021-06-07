@@ -9,6 +9,7 @@ import store from './redux/store';
 import PrivateRoute from './components/ProtectedRoute';
 import Feed from './pages/Feed';
 import { PersistGate } from 'redux-persist/integration/react';
+import ProductDetail from './pages/ProductDetail';
 
 function App() {
     return (
@@ -21,6 +22,10 @@ function App() {
                             <Route path="/products" component={Products} />
                             <PrivateRoute exact path="/" component={Feed} />
                             <PrivateRoute path="/profile" component={Profile} />
+                            <PrivateRoute
+                                path="/product/:id"
+                                component={ProductDetail}
+                            />
                             <Route path="/login" component={Landing} />
                         </Switch>
                     </Router>

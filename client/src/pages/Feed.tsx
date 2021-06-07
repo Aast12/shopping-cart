@@ -14,9 +14,11 @@ import {
     Link,
 } from '@chakra-ui/react';
 import { useEffect, useMemo } from 'react';
+import { useHistory } from 'react-router-dom';
 import useProducts from '../hooks/useProducts';
 import useShoppingCart from '../hooks/useShoppingCart';
 import { Product } from '../types/Product';
+import { formatter } from '../utils';
 
 type ProductCardProps = {
     data: Product;
@@ -25,18 +27,13 @@ type ProductCardProps = {
 const ProductCard = ({
     data: { name, price, image, description, _id },
 }: ProductCardProps) => {
-    const formatter = useMemo(
-        () =>
-            new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-            }),
-        []
-    );
+    const { push } = useHistory();
     const { toggle, contains, products } = useShoppingCart();
 
     return (
         <Box
+            onClick={() => push(`/product/${_id}`)}
+            cursor="pointer"
             transition="all 0.1s ease-in"
             _hover={{ shadow: 'sm', bgColor: 'gray.50' }}
             bgColor="white"
@@ -80,9 +77,7 @@ const ProductCard = ({
                 </Box>
                 <Box p="4">
                     <Heading mt="1" fontWeight="semibold" size="md" isTruncated>
-                        <LinkOverlay as={Link} to={`/`}>
-                            {name}
-                        </LinkOverlay>
+                        <LinkOverlay>{name}</LinkOverlay>
                     </Heading>
                     <Text fontSize="medium" fontWeight="light">
                         {formatter.format(price)}
