@@ -4,7 +4,6 @@ import {
     Button,
     Container,
     Heading,
-    Link,
     Spinner,
     Stack,
     useBoolean,
@@ -13,7 +12,6 @@ import {
     useBreakpointValue,
     Text,
     Flex,
-    Input,
     NumberInput,
     NumberInputField,
     NumberInputStepper,
@@ -40,7 +38,6 @@ const ProductDetail = () => {
     const { add, getById, products } = useShoppingCart();
 
     const addToCart = () => {
-        console.log('XD');
         add(id, cartQuantity);
     };
 
@@ -148,6 +145,10 @@ const ProductDetail = () => {
                                                 setCartQuantity(parseInt(e))
                                             }
                                             min={1}
+                                            isDisabled={
+                                                (product.stock ?? 0) === 0
+                                            }
+                                            max={product.stock ?? 0}
                                         >
                                             <NumberInputField focusBorderColor="red.200" />
                                             <NumberInputStepper>
@@ -160,6 +161,9 @@ const ProductDetail = () => {
                                             rounded="full"
                                             colorScheme="blue"
                                             onClick={addToCart}
+                                            isDisabled={
+                                                (product.stock ?? 0) === 0
+                                            }
                                         >
                                             Add To Cart
                                         </Button>

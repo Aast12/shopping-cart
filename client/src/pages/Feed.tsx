@@ -1,5 +1,6 @@
 import { AddIcon, CloseIcon } from '@chakra-ui/icons';
 import {
+    Badge,
     Box,
     Center,
     Container,
@@ -25,10 +26,10 @@ type ProductCardProps = {
 };
 
 const ProductCard = ({
-    data: { name, price, image, description, _id },
+    data: { name, price, image, description, _id, stock },
 }: ProductCardProps) => {
     const { push } = useHistory();
-    const { toggle, contains, products } = useShoppingCart();
+    const { toggle, contains } = useShoppingCart();
 
     return (
         <Box
@@ -45,6 +46,7 @@ const ProductCard = ({
             m={1}
         >
             <IconButton
+                hidden={(stock ?? 0) === 0}
                 aria-label="Add to cart"
                 icon={_id && !contains(_id) ? <AddIcon /> : <CloseIcon />}
                 position="absolute"
@@ -58,6 +60,11 @@ const ProductCard = ({
                     if (_id) toggle(_id);
                 }}
             />
+            {(stock ?? 0) === 0 && (
+                <Badge position="absolute" zIndex={1} m={1} colorScheme="red">
+                    Out of Stock
+                </Badge>
+            )}
             <LinkBox h="100%" onClick={() => push(`/product/${_id}`)}>
                 <Box w="100%" h="50%" bgColor="gray.200">
                     {image && (

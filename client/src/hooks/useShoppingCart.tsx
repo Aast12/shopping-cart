@@ -19,12 +19,18 @@ const useShoppingCart = () => {
             description: 'Your shopping cart was modified',
             status: 'info',
             duration: 1000,
-            position: 'bottom-right'
+            position: 'bottom-right',
         });
         dispatch(toggleProduct({ id }));
     };
 
     const add = (id: string, quantity: number) => {
+        toast({
+            description: 'The product has been added to your cart',
+            status: 'info',
+            duration: 1000,
+            position: 'bottom-right',
+        });
         dispatch(addProduct({ id, quantity }));
     };
 
