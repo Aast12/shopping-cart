@@ -11,7 +11,7 @@ import {
     LinkOverlay,
     Text,
     useBreakpointValue,
-    Link,
+    // Link,
 } from '@chakra-ui/react';
 import { useEffect, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -32,7 +32,6 @@ const ProductCard = ({
 
     return (
         <Box
-            onClick={() => push(`/product/${_id}`)}
             cursor="pointer"
             transition="all 0.1s ease-in"
             _hover={{ shadow: 'sm', bgColor: 'gray.50' }}
@@ -46,7 +45,6 @@ const ProductCard = ({
             m={1}
         >
             <IconButton
-                as={Link}
                 aria-label="Add to cart"
                 icon={_id && !contains(_id) ? <AddIcon /> : <CloseIcon />}
                 position="absolute"
@@ -60,7 +58,7 @@ const ProductCard = ({
                     if (_id) toggle(_id);
                 }}
             />
-            <LinkBox h="100%">
+            <LinkBox h="100%" onClick={() => push(`/product/${_id}`)}>
                 <Box w="100%" h="50%" bgColor="gray.200">
                     {image && (
                         <Image

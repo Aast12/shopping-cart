@@ -20,6 +20,9 @@ export class Product {
     public brand?: string;
 
     @prop({ default: 0 })
+    public stock: number;
+
+    @prop({ default: 0 })
     public views?: number;
 
     @prop({})

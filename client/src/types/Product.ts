@@ -8,4 +8,7 @@ export type Product = {
         data: string;
     };
     brand?: string;
+    stock?: number;
+    views?: number;
+    lastView?: string;
 };

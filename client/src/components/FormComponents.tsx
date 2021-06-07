@@ -35,7 +35,7 @@ export const ValidatedInput = <T,>({
         formState: { errors },
     } = useFormContext<T>();
     return (
-        <FormControl isRequired isInvalid={errors[field] ? true : false}>
+        <FormControl isRequired={registerOptions.required ? true : false} isInvalid={errors[field] ? true : false}>
             {label && <FormLabel {...labelProps}>{label}</FormLabel>}
             <Input
                 {...props}

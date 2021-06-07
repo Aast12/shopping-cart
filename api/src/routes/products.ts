@@ -36,9 +36,11 @@ router.post('/create', upload.single('image'), async (req, res) => {
     }
 });
 
-router.put('/update', upload.single('image'), async (req, res) => {
+router.put('/:id', upload.single('image'), async (req, res) => {
+    const _id = req.params.id;
+
     try {
-        const { _id, ...values } = req.body;
+        const values = req.body;
 
         if (req.file) {
             await Product.updateOne(
@@ -58,9 +60,11 @@ router.put('/update', upload.single('image'), async (req, res) => {
     }
 });
 
-router.delete('/delete', async (req, res) => {
+router.delete('/:id', async (req, res) => {
+    const _id = req.params.id;
+
     try {
-        await Product.deleteOne({ _id: req.body?.id });
+        await Product.deleteOne({ _id });
         res.sendStatus(200);
     } catch (err) {
         res.status(500).send(err);

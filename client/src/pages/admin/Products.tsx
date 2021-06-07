@@ -7,7 +7,6 @@ import {
     Flex,
     Input,
     Text,
-    Textarea,
     InputGroup,
     InputLeftElement,
     Heading,
@@ -21,13 +20,13 @@ import { useEffect, useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { Product } from '../../types/Product';
 import { FormProvider, useForm } from 'react-hook-form';
-import useProducts from '../../hooks/useProducts';
+import useProducts, { ProductPostPayload } from '../../hooks/useProducts';
 import {
     FileUpload,
     ValidatedInput,
     ValidatedInputProps,
 } from '../../components/FormComponents';
-import { toBase64 } from '../../utils';
+// import { toBase64 } from '../../utils';
 
 const castInputProps = (
     values: ValidatedInputProps<Product & { image: FileList }>
@@ -39,7 +38,7 @@ const Products = () => {
 
     const [selected, setSelected] = useState<Product | undefined>();
     const [adding, setAdding] = useState<boolean>(false);
-    const methods = useForm<Omit<Product, 'image'> & { image: FileList }>();
+    const methods = useForm<Product & { image: FileList }>();
     const { handleSubmit, register, setValue, watch } = methods;
     const [imageValue] = watch(['image']);
     const [imageSrc, setImageSrc] = useState<string | ArrayBuffer | null>(null);
@@ -51,18 +50,21 @@ const Products = () => {
         image,
         ...values
     }: Product & { image: FileList }) => {
+        let payload = {
+            ...values,
+            description: description ?? '',
+        } as ProductPostPayload;
+
+        if (image && image.length > 0) payload.image = image[0];
+
+        console.log('brooo??', payload);
+
         if (adding) {
-            create({
-                ...values,
-                description: description ?? '',
-                image: image[0],
-            });
+            create(payload);
         } else if (selected?._id) {
             edit({
-                ...selected,
-                ...values,
-                description: description ?? '',
-                image: image[0],
+                _id: selected._id,
+                ...payload,
             });
         }
     };
@@ -92,9 +94,10 @@ const Products = () => {
 
     const setValues = (values: Product) => {
         setValue('name', values.name);
+        setValue('brand', values.brand ?? '');
         setValue('price', values.price);
         setValue('description', values.description);
-        // setValue('name', values.);
+        setValue('stock', values.stock ?? 0);
     };
 
     const selectProduct = (product: Product | undefined) => {
@@ -220,6 +223,14 @@ const Products = () => {
                                             })}
                                         />
                                         <ValidatedInput
+                                            label="Brand"
+                                            placeholder="Brand"
+                                            {...castInputProps({
+                                                field: 'brand',
+                                                registerOptions: {},
+                                            })}
+                                        />
+                                        <ValidatedInput
                                             label="Price"
                                             type="number"
                                             placeholder="Price"
@@ -248,7 +259,17 @@ const Products = () => {
                                                 },
                                             })}
                                         />
-
+                                        <ValidatedInput
+                                            label="Stock units"
+                                            placeholder="Stock"
+                                            type="number"
+                                            {...castInputProps({
+                                                field: 'stock',
+                                                registerOptions: {
+                                                    min: 0,
+                                                },
+                                            })}
+                                        />
                                         <Image
                                             src={
                                                 typeof imageSrc === 'string'
