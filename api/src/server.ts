@@ -10,6 +10,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { DocumentType } from '@typegoose/typegoose';
 import { UserToken } from './types';
+import ordersRouter from './routes/orders';
 
 const PORT = 5000;
 
@@ -44,6 +45,7 @@ const main = async () => {
 
     app.use('/products', productsRouter);
     app.use('/users', usersRouter);
+    app.use('/orders', ordersRouter);
     app.post('/login', async (req, res) => {
         let { email, password } = req.body;
         let user = await UserModel.findOne({ email: email });

@@ -7,13 +7,16 @@ import {
 } from '@typegoose/typegoose';
 import { Product } from './Product';
 import bcrypt from 'bcrypt';
+
+export class OrderItem {
+    product: Ref<Product>;
+    quantity: number;
+    unitPrice: number;
+}
+
 export class Order {
-    @prop({})
-    public products: mongoose.Types.Array<{
-        product: Ref<Product>;
-        quantity: number;
-        unitPrice: number;
-    }>;
+    @prop({ default: [] })
+    public products: mongoose.Types.Array<OrderItem>;
 
     @prop({})
     public total: number;
@@ -70,7 +73,7 @@ export class User {
     };
 
     @prop({ _id: true, default: [] })
-    public orders?: mongoose.Types.Array<Order>;
+    public orders: mongoose.Types.Array<Order>;
 }
 
 export default getModelForClass(User, {

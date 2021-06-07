@@ -24,6 +24,7 @@ import {
     IconButton,
     Text,
 } from '@chakra-ui/react';
+import axios from 'axios';
 import { useMemo } from 'react';
 import Card from '../components/Card';
 import useProducts from '../hooks/useProducts';
@@ -54,6 +55,17 @@ const ShoppingCart = () => {
             return previous + current.product.price * (current.quantity ?? 0);
         }, 0);
     }, [filteredProducts]);
+
+    const checkout = () => {
+        axios
+            .post('/orders/create', cartProducts)
+            .then((res) => {
+                console.log(res);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     if (loading || isLoading) return <Spinner />;
 
@@ -198,8 +210,8 @@ const ShoppingCart = () => {
                         </Stat>
                         <Divider my={2} />
                         <ButtonGroup>
-                            <Button colorScheme="blue">
-                                Proceed to checkout
+                            <Button colorScheme="blue" onClick={checkout}>
+                                Checkout
                             </Button>
                             <Button colorScheme="red" onClick={drop}>
                                 Empty Cart

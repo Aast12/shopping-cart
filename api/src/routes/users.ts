@@ -11,7 +11,6 @@ router.route('/').get(requireLogin, async (req: Request, res) => {
     // @ts-ignore
     const user = await User.findById(req.user.id);
 
-    console.log('->', user);
     res.status(200).send(user);
 });
 
