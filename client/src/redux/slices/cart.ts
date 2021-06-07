@@ -13,7 +13,7 @@ const shoppingCartSlice = createSlice({
                 (product) => product.id === action.payload.id
             );
 
-            if (queryIdx && queryIdx !== -1) {
+            if (queryIdx !== undefined && queryIdx !== -1) {
                 state.products?.splice(queryIdx, 1);
             } else {
                 state.products?.push({ id: action.payload.id, quantity: 1 });
@@ -27,7 +27,7 @@ const shoppingCartSlice = createSlice({
                 (product) => product.id === action.payload.id
             );
 
-            if (queryIdx && queryIdx !== -1) {
+            if (queryIdx !== undefined && queryIdx !== -1) {
                 state.products?.push(action.payload);
             } else if (queryIdx) {
                 state.products[queryIdx] = action.payload;
@@ -38,7 +38,7 @@ const shoppingCartSlice = createSlice({
                 (product) => product.id === action.payload.id
             );
 
-            if (queryIdx && queryIdx !== -1) {
+            if (queryIdx !== undefined && queryIdx !== -1) {
                 state.products?.splice(queryIdx, 1);
             }
         },

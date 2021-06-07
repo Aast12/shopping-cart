@@ -1,15 +1,26 @@
-import { useDispatch } from 'react-redux';
+import { useToast } from '@chakra-ui/react';
+import { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
     addProduct,
     deleteProduct,
     toggleProduct,
     empty,
 } from '../redux/slices/cart';
+import { RootState } from '../redux/store';
 
 const useShoppingCart = () => {
     const dispatch = useDispatch();
+    const toast = useToast();
+    const { products } = useSelector((state: RootState) => state.cart);
 
     const toggle = (id: string) => {
+        toast({
+            description: 'Your shopping cart was modified',
+            status: 'info',
+            duration: 1000,
+            position: 'bottom-right'
+        });
         dispatch(toggleProduct({ id }));
     };
 
@@ -25,7 +36,25 @@ const useShoppingCart = () => {
         dispatch(empty({}));
     };
 
-    return { toggle, add, del, drop };
+    const contains = useCallback(
+        (id: string) => {
+            const item = products.find((product) => product.id === id);
+
+            return item ? true : false;
+        },
+        [products]
+    );
+
+    const getById = useCallback(
+        (id: string) => {
+            const item = products.find((product) => product.id === id);
+
+            return item;
+        },
+        [products]
+    );
+
+    return { toggle, add, del, drop, contains, getById, products };
 };
 
 export default useShoppingCart;

@@ -1,5 +1,6 @@
 import {
     Avatar,
+    Badge,
     Box,
     BoxProps,
     Button,
@@ -18,11 +19,13 @@ import { AiOutlineShoppingCart, AiFillCaretDown } from 'react-icons/ai';
 
 import { Link as RouterLink } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
+import useShoppingCart from '../hooks/useShoppingCart';
 import useUser from '../hooks/useUser';
 
 const NavBar = ({ ...props }: BoxProps) => {
     const { logOut } = useAuth();
     const { user } = useUser();
+    const { products } = useShoppingCart();
 
     const pictureSrc = useMemo(() => {
         if (!user?.profilePicture) return '';
@@ -47,12 +50,26 @@ const NavBar = ({ ...props }: BoxProps) => {
                     <Link as={RouterLink} to="/products">
                         Explore
                     </Link>
-                    <IconButton
-                        variant="ghost"
-                        borderRadius="full"
-                        aria-label="shopping cart"
-                        icon={<AiOutlineShoppingCart />}
-                    />
+                    <Box position="relative">
+                        <IconButton
+                            variant="ghost"
+                            borderRadius="full"
+                            aria-label="shopping cart"
+                            icon={<AiOutlineShoppingCart />}
+                        />
+                        {products.length > 0 && (
+                            <Badge
+                                position="absolute"
+                                top="0"
+                                fontSize="xs"
+                                rounded="full"
+                                right="0"
+                                colorScheme="red"
+                            >
+                                {products.length}
+                            </Badge>
+                        )}
+                    </Box>
                     <Button
                         variant="ghost"
                         rounded="full"

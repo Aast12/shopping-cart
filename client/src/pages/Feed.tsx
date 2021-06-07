@@ -1,4 +1,4 @@
-import { AddIcon } from '@chakra-ui/icons';
+import { AddIcon, CloseIcon } from '@chakra-ui/icons';
 import {
     Box,
     Center,
@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useMemo } from 'react';
 import useProducts from '../hooks/useProducts';
+import useShoppingCart from '../hooks/useShoppingCart';
 import { Product } from '../types/Product';
 
 type ProductCardProps = {
@@ -22,7 +23,7 @@ type ProductCardProps = {
 };
 
 const ProductCard = ({
-    data: { name, price, image, description },
+    data: { name, price, image, description, _id },
 }: ProductCardProps) => {
     const formatter = useMemo(
         () =>
@@ -32,6 +33,7 @@ const ProductCard = ({
             }),
         []
     );
+    const { toggle, contains, products } = useShoppingCart();
 
     return (
         <Box
@@ -49,14 +51,17 @@ const ProductCard = ({
             <IconButton
                 as={Link}
                 aria-label="Add to cart"
-                icon={<AddIcon />}
+                icon={_id && !contains(_id) ? <AddIcon /> : <CloseIcon />}
                 position="absolute"
                 zIndex={1}
                 colorScheme="blackAlpha"
                 top="0"
+                right="0"
                 m={1}
                 size="sm"
-                onClick={() => console.log('WOWR')}
+                onClick={() => {
+                    if (_id) toggle(_id);
+                }}
             />
             <LinkBox h="100%">
                 <Box w="100%" h="50%" bgColor="gray.200">
@@ -114,6 +119,7 @@ const Feed = () => {
     useEffect(() => {
         console.log(products);
     }, [products]);
+
     return (
         <Container maxW="container.lg" py={8}>
             <Heading>Explore Products</Heading>
