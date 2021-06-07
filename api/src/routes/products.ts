@@ -1,6 +1,6 @@
 import express from 'express';
 import Product from '../models/Product';
-import { getAllServices } from '../services/products';
+// import { getAllServices } from '../services/products';
 
 import { createImage } from '../services/media';
 import { upload } from '../services/multer';
@@ -8,7 +8,15 @@ import { upload } from '../services/multer';
 const router = express.Router();
 
 router.get('/', async (_, res) => {
-    const products = await getAllServices();
+    // const products = await getAllServices();
+    const products = await Product.find({});
+
+    res.send(products);
+});
+
+router.get('/:id', async (req, res) => {
+    // const products = await getAllServices();
+    const products = await Product.findById(req.params.id);
 
     res.send(products);
 });
