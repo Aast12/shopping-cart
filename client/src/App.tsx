@@ -7,6 +7,7 @@ import Profile from './pages/Profile';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import PrivateRoute from './components/ProtectedRoute';
+import Feed from './pages/Feed';
 
 function App() {
     return (
@@ -15,8 +16,8 @@ function App() {
                 <Router>
                     <NavBar />
                     <Switch>
-                        {/* <Route path="/products" component={Products} /> */}
-                        <PrivateRoute exact path="/" component={Products} />
+                        <Route path="/products" component={Products} />
+                        <PrivateRoute exact path="/" component={Feed} />
                         <PrivateRoute path="/profile" component={Profile} />
                         <Route path="/login" component={Landing} />
                     </Switch>
