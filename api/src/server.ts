@@ -79,7 +79,7 @@ const main = async () => {
     });
 
     app.listen(PORT, () => {
-        console.log('Server running????');
+        console.log('Server running');
     });
 };
 
