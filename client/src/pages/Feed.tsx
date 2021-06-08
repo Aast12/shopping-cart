@@ -8,13 +8,15 @@ import {
     Heading,
     IconButton,
     Image,
+    Input,
     LinkBox,
     LinkOverlay,
     Text,
     useBreakpointValue,
+    VStack,
     // Link,
 } from '@chakra-ui/react';
-import { useEffect, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import useProducts from '../hooks/useProducts';
 import useShoppingCart from '../hooks/useShoppingCart';
@@ -99,30 +101,39 @@ const ProductCard = ({
 
 const Feed = () => {
     const { products, loading, error } = useProducts();
+    const [filter, setFilter] = useState('');
     const cols = useBreakpointValue({ base: 1, sm: 2, md: 3, lg: 4, '2xl': 5 });
 
     const rows = useMemo(() => {
         const rows: Product[][] = [];
         const cValue = cols ?? 1;
-        const products_ = [...products];
-        // const products_ = products.filter(({ name }) =>
-        //     name.toLowerCase().includes(filter.toLowerCase())
-        // );
+
+        const products_ = products.filter(
+            ({ name, description }) =>
+                name.toLowerCase().includes(filter.toLowerCase()) ||
+                (description &&
+                    description.toLowerCase().includes(filter.toLowerCase()))
+        );
 
         for (let i = 0; i < products_.length / cValue; i++) {
             rows.push(products_.slice(i * cValue, (i + 1) * cValue));
         }
 
         return rows;
-    }, [cols, products]);
-
-    useEffect(() => {
-        console.log(products);
-    }, [products]);
+    }, [cols, products, filter]);
 
     return (
         <Container maxW="container.lg" py={8}>
-            <Heading>Explore Products</Heading>
+            <VStack align="start">
+                <Heading>Explore Products</Heading>
+                <Input
+                    value={filter}
+                    rounded="full"
+                    bgColor="gray.100"
+                    onChange={(e) => setFilter(e.target.value)}
+                    placeholder="Search"
+                />
+            </VStack>
             <Box w="100%" py={4}>
                 {rows.length > 0 ? (
                     rows?.map((row, idx) => (

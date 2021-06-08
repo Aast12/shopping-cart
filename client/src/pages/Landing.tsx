@@ -223,9 +223,9 @@ const Landing = () => {
                             w="100%"
                             my={2}
                         >
-                            <Link color="blue.300" mt={0} fontSize="sm">
+                            {/* <Link color="blue.300" mt={0} fontSize="sm">
                                 Forgot password?
-                            </Link>
+                            </Link> */}
                             <Text fontSize="sm">
                                 Not registered yet?{' '}
                                 <Link color="blue.300" onClick={onOpen}>
@@ -233,7 +233,7 @@ const Landing = () => {
                                 </Link>
                             </Text>
                         </Flex>
-
+                        {error && <Text color="red.500">{error}</Text>}
                         <SignUpModal isOpen={isOpen} onClose={onClose} />
                     </Card>
                 </Center>

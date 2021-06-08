@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../redux/slices/user';
 import { User } from '../types/Users';
+import { empty } from '../redux/slices/cart';
 
 type SignUpData = Omit<User, 'profilePicture' | '_id' | 'orders'> & {
     password: string;
@@ -53,6 +54,7 @@ const useAuth = () => {
         axios.get('/logout').finally(() => {
             history.push('/');
             dispatch(setUser(null));
+            dispatch(empty({}));
         });
     };
 

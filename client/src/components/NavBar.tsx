@@ -109,7 +109,7 @@ const NavBar = ({ ...props }: BoxProps) => {
                             aria-label="options"
                             icon={<AiFillCaretDown />}
                         ></MenuButton>
-                        <MenuList color="black">
+                        <MenuList color="black" zIndex={2}>
                             {user.role === 'user' && (
                                 <>
                                     <MenuItem as={RouterLink} to="/profile">
