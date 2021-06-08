@@ -8,7 +8,7 @@ export default function ProtectedRoute({ role = 'user', ...props }) {
 
     if (isLoading) return <Spinner />;
 
-    if (user && user.role === role)
+    if (user && (user.role === role || role === 'both'))
         return <Route {...rest} render={(props) => <Component {...props} />} />;
 
     return <Redirect to="/login" />;

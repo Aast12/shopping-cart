@@ -12,6 +12,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import ProductDetail from './pages/ProductDetail';
 import ShoppingCart from './pages/ShoppingCart';
 import Orders from './pages/Orders';
+import MultipleRoute from './components/MultipleRoute';
 
 function App() {
     return (
@@ -23,6 +24,7 @@ function App() {
                             <NavBar />
                             <Switch>
                                 <ProtectedRoute
+                                    role="both"
                                     path="/profile"
                                     component={Profile}
                                 />
@@ -38,17 +40,13 @@ function App() {
                                     path="/orders"
                                     component={Orders}
                                 />
-                                <Route path="/login" component={Landing} />
-                                <ProtectedRoute
+                                <MultipleRoute
                                     exact
                                     path="/"
-                                    component={Feed}
+                                    adminComponent={Products}
+                                    userComponent={Feed}
                                 />
-                                <ProtectedRoute
-                                    role="admin"
-                                    path="/products"
-                                    component={Products}
-                                />
+                                <Route path="/login" component={Landing} />
                             </Switch>
                         </Box>
                     </Router>

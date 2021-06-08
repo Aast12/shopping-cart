@@ -8,7 +8,6 @@ import {
     Heading,
     HStack,
     IconButton,
-    Link,
     Menu,
     MenuButton,
     MenuItem,
@@ -44,35 +43,37 @@ const NavBar = ({ ...props }: BoxProps) => {
         <Box py={3} w="100%" borderBottomWidth={1} bgColor="teal" color="white">
             <Flex alignItems="center" justifyContent="space-around" w="100%">
                 <Heading size="md" mx={3} as={RouterLink} to="/">
-                    Shopping
+                    Shopping {user.role === 'admin' && <Badge>ADMIN</Badge>}
                 </Heading>
                 <HStack alignItems="center">
-                    <Box position="relative">
-                        <IconButton
-                            _hover={{
-                                color: 'teal.500',
-                                bgColor: 'whiteAlpha.900',
-                            }}
-                            as={RouterLink}
-                            to="/cart"
-                            variant="ghost"
-                            borderRadius="full"
-                            aria-label="shopping cart"
-                            icon={<AiOutlineShoppingCart />}
-                        />
-                        {products.length > 0 && (
-                            <Badge
-                                position="absolute"
-                                top="0"
-                                fontSize="xs"
-                                rounded="full"
-                                right="0"
-                                colorScheme="red"
-                            >
-                                {products.length}
-                            </Badge>
-                        )}
-                    </Box>
+                    {user.role === 'user' && (
+                        <Box position="relative">
+                            <IconButton
+                                _hover={{
+                                    color: 'teal.500',
+                                    bgColor: 'whiteAlpha.900',
+                                }}
+                                as={RouterLink}
+                                to="/cart"
+                                variant="ghost"
+                                borderRadius="full"
+                                aria-label="shopping cart"
+                                icon={<AiOutlineShoppingCart />}
+                            />
+                            {products.length > 0 && (
+                                <Badge
+                                    position="absolute"
+                                    top="0"
+                                    fontSize="xs"
+                                    rounded="full"
+                                    right="0"
+                                    colorScheme="red"
+                                >
+                                    {products.length}
+                                </Badge>
+                            )}
+                        </Box>
+                    )}
                     <Button
                         _hover={{
                             color: 'teal.500',
@@ -109,12 +110,16 @@ const NavBar = ({ ...props }: BoxProps) => {
                             icon={<AiFillCaretDown />}
                         ></MenuButton>
                         <MenuList color="black">
-                            <MenuItem as={RouterLink} to="/profile">
-                                Profile
-                            </MenuItem>
-                            <MenuItem as={RouterLink} to="/orders">
-                                My Orders
-                            </MenuItem>
+                            {user.role === 'user' && (
+                                <>
+                                    <MenuItem as={RouterLink} to="/profile">
+                                        Profile
+                                    </MenuItem>
+                                    <MenuItem as={RouterLink} to="/orders">
+                                        My Orders
+                                    </MenuItem>
+                                </>
+                            )}
                             <MenuItem onClick={logOut}>Log Out</MenuItem>
                         </MenuList>
                     </Menu>
