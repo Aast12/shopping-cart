@@ -17,6 +17,10 @@ router.post(
         if (!req.user) return res.sendStatus(401);
 
         const order = req.body as { id: string; quantity: number }[];
+
+        if (!order || order.length === 0)
+            return res.status(400).send({ message: 'Order can not be empty' });
+
         // @ts-ignore
         const { id } = req.user;
 
