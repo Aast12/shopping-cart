@@ -1,11 +1,10 @@
 import express from 'express';
 import { requireLogin } from '../middleware';
-import User, { Order, OrderItem } from '../models/User';
+import User from '../models/User';
 import Product from '../models/Product';
-// import { getAllServices } from '../services/products';
-
 import { upload } from '../services/multer';
 import { mongoose } from '@typegoose/typegoose';
+import Order, { OrderItem } from '../models/Order';
 
 const router = express.Router();
 
@@ -39,12 +38,21 @@ router.post(
                     });
                 }
 
-                orderItem.product = product;
+                if (product.stock < item.quantity) {
+                    return res.status(500).send({
+                        message: 'Product ran out of stock',
+                    });
+                }
+
+                orderItem.product = product._id;
                 orderItem.unitPrice = product.price;
 
                 total += product.price * item.quantity;
 
                 orderDocument.products.push(orderItem);
+
+                product.stock -= item.quantity;
+                product.save();
             }
 
             orderDocument.total = total;

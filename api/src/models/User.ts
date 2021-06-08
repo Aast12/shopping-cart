@@ -1,29 +1,6 @@
-import {
-    getModelForClass,
-    mongoose,
-    pre,
-    prop,
-    Ref,
-} from '@typegoose/typegoose';
-import { Product } from './Product';
+import { getModelForClass, mongoose, pre, prop } from '@typegoose/typegoose';
 import bcrypt from 'bcrypt';
-
-export class OrderItem {
-    product: Ref<Product>;
-    quantity: number;
-    unitPrice: number;
-}
-
-export class Order {
-    @prop({ default: [] })
-    public products: mongoose.Types.Array<OrderItem>;
-
-    @prop({})
-    public total: number;
-
-    @prop({ default: Date.now() })
-    public date: Date;
-}
+import { Order } from './Order';
 
 @pre<User>('save', function (next) {
     const user = this;
