@@ -1,6 +1,6 @@
 import express from 'express';
+import { requireAdmin } from '../middleware';
 import Product from '../models/Product';
-// import { getAllServices } from '../services/products';
 
 import { createImage } from '../services/media';
 import { upload } from '../services/multer';
@@ -8,37 +8,40 @@ import { upload } from '../services/multer';
 const router = express.Router();
 
 router.get('/', async (_, res) => {
-    // const products = await getAllServices();
     const products = await Product.find({});
 
     res.send(products);
 });
 
 router.get('/:id', async (req, res) => {
-    // const products = await getAllServices();
     const products = await Product.findById(req.params.id);
 
     res.send(products);
 });
 
-router.post('/create', upload.single('image'), async (req, res) => {
-    try {
-        const newProduct = new Product(req.body);
+router.post(
+    '/create',
+    requireAdmin,
+    upload.single('image'),
+    async (req, res) => {
+        try {
+            const newProduct = new Product(req.body);
 
-        if (req.file) {
-            newProduct.image = createImage(req.file);
+            if (req.file) {
+                newProduct.image = createImage(req.file);
+            }
+
+            await newProduct.save();
+            res.status(200).send({
+                id: newProduct._id,
+            });
+        } catch (err) {
+            res.status(500).send(err);
         }
-
-        await newProduct.save();
-        res.status(200).send({
-            id: newProduct._id,
-        });
-    } catch (err) {
-        res.status(500).send(err);
     }
-});
+);
 
-router.put('/:id', upload.single('image'), async (req, res) => {
+router.put('/:id', requireAdmin, upload.single('image'), async (req, res) => {
     const _id = req.params.id;
 
     try {
@@ -62,7 +65,7 @@ router.put('/:id', upload.single('image'), async (req, res) => {
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAdmin, async (req, res) => {
     const _id = req.params.id;
 
     try {

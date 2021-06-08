@@ -15,9 +15,16 @@ import {
     Heading,
     IconButton,
     Input,
+    Modal,
+    ModalBody,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalOverlay,
     Stack,
     Text,
     useBoolean,
+    useDisclosure,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import moment from 'moment';
@@ -29,6 +36,7 @@ import {
     ValidatedInput,
     ValidatedInputProps,
 } from '../components/FormComponents';
+import useAuth from '../hooks/useAuth';
 import { setUser } from '../redux/slices/user';
 import { RootState } from '../redux/store';
 import { User } from '../types/Users';
@@ -50,6 +58,8 @@ const Profile = () => {
     const [profilePictureValue] = watch(['profilePicture']);
     const [profilePicSrc, setProfilePicSrc] =
         useState<string | ArrayBuffer | null>(null);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { deleteProfile } = useAuth();
 
     const onSubmit = (values: UserPayload) => {
         if (user) {
@@ -255,6 +265,45 @@ const Profile = () => {
                     </Stack>
                 </form>
             </FormProvider>
+            <Button colorScheme="red" onClick={onOpen}>
+                Delete Profile
+            </Button>
+            <Modal
+                isOpen={isOpen}
+                onClose={onClose}
+                scrollBehavior="inside"
+                isCentered
+                closeOnOverlayClick={false}
+            >
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader textAlign="center"></ModalHeader>
+                    <ModalBody>
+                        <Text>
+                            Are you sure you want to delete your account?
+                        </Text>
+                    </ModalBody>
+
+                    <ModalFooter justifyContent="center">
+                        <ButtonGroup>
+                            <Button
+                                variant="ghost"
+                                onClick={deleteProfile}
+                                colorScheme="red"
+                            >
+                                Yes, delete it
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                onClick={onClose}
+                                colorScheme="blue"
+                            >
+                                No, I changed my mind
+                            </Button>
+                        </ButtonGroup>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </Container>
     );
 };

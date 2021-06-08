@@ -86,11 +86,11 @@ const Products = () => {
                 _id: selected._id,
             })
                 .then((res) => {
-                    console.log(res);
+                    console.log('???', res);
                     setSuccess('The product was updated succesfully');
                 })
                 .catch((err) => {
-                    console.log(err);
+                    console.log('!!!', err);
                     const msg =
                         err.respose?.data?.message ?? 'An error ocurred';
                     setError(msg);
@@ -401,9 +401,6 @@ const Products = () => {
                                                     </Button>
                                                     <Button
                                                         colorScheme="green"
-                                                        // onClick={() => {
-                                                        //     // Submit
-                                                        // }}
                                                         type="submit"
                                                     >
                                                         Update
@@ -413,7 +410,6 @@ const Products = () => {
                                                 <Button
                                                     type="submit"
                                                     colorScheme="green"
-                                                    // onClick={() => {}}
                                                 >
                                                     Create
                                                 </Button>

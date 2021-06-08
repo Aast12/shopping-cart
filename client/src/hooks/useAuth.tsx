@@ -50,6 +50,12 @@ const useAuth = () => {
             });
     };
 
+    const deleteProfile = () => {
+        axios.delete('/users').finally(() => {
+            logOut();
+        });
+    };
+
     const logOut = () => {
         axios.get('/logout').finally(() => {
             history.push('/');
@@ -63,6 +69,7 @@ const useAuth = () => {
         loginUser,
         logOut,
         error,
+        deleteProfile,
     };
 };
 

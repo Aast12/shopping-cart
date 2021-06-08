@@ -39,18 +39,27 @@ const Orders = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const [previewOrder, setPreviewOrder] = useState<Order>();
 
+    const filteredOrders = useMemo(() => {
+        if (orders) {
+            return orders.slice().sort((o1, o2) => {
+                return o2.date.localeCompare(o1.date);
+            });
+        }
+        return [];
+    }, [orders]);
+
     if (!user) return <Text>You are not logged in</Text>;
 
     return (
         <Container maxW="container.md" py={8}>
             <Heading>My Orders</Heading>
             <Divider my={2} />
-            <Text color="gray.500">{orders?.length} Order(s)</Text>
+            <Text color="gray.500">{filteredOrders?.length} Order(s)</Text>
             <Card my={4}>
-                {orders?.length === 0 && (
+                {filteredOrders?.length === 0 && (
                     <Text color="gray.500">You haven't done any order.</Text>
                 )}
-                {orders?.map((order) => {
+                {filteredOrders?.map((order) => {
                     const { date, products, total, _id } = order;
                     return (
                         <Box

@@ -62,7 +62,7 @@ const EventModal = ({
                             <Text fontWeight="bold">{errorMessage}</Text>
                         </VStack>
                     )}
-                    {!isLoading && gotSuccess && (
+                    {!isLoading && gotSuccess && !gotError && (
                         <VStack color="green.400" spacing={4}>
                             <CheckIcon fontSize="5xl" />
                             <Text fontWeight="bold">{successMessage}</Text>

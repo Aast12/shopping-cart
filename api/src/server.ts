@@ -11,6 +11,7 @@ import jwt from 'jsonwebtoken';
 import { DocumentType } from '@typegoose/typegoose';
 import { UserToken } from './types';
 import ordersRouter from './routes/orders';
+import { requireLogin } from './middleware';
 
 const PORT = 5000;
 
@@ -43,9 +44,9 @@ const main = async () => {
     app.use(cookieParser());
     app.use(express.static(path.join(__dirname, 'public')));
 
-    app.use('/products', productsRouter);
+    app.use('/products', requireLogin, productsRouter);
     app.use('/users', usersRouter);
-    app.use('/orders', ordersRouter);
+    app.use('/orders', requireLogin, ordersRouter);
     app.post('/login', async (req, res) => {
         let { email, password } = req.body;
         let user = await UserModel.findOne({ email: email });

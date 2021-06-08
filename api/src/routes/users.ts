@@ -7,13 +7,6 @@ import { requireLogin } from '../middleware';
 
 const router = express.Router();
 
-router.route('/').get(requireLogin, async (req: Request, res) => {
-    // @ts-ignore
-    const user = await User.findById(req.user.id);
-
-    res.status(200).send(user);
-});
-
 router.post('/create', upload.single('image'), async (req, res) => {
     try {
         if (await User.findOne({ email: req.body.email })) {
@@ -33,38 +26,67 @@ router.post('/create', upload.single('image'), async (req, res) => {
     return;
 });
 
-router.put('/:id', upload.single('profilePicture'), async (req, res) => {
-    try {
-        const { ...values } = req.body;
+router.get('/', requireLogin, async (req: Request, res) => {
+    // @ts-ignore
+    if (!req.user) res.sendStatus(401);
+    else {
+        // @ts-ignore
+        const { id } = req.user;
+        try {
+            const user = await User.findById(id);
 
-        console.log(req.file);
-
-        if (req.file) {
-            console.log('XD');
-            await User.updateOne(
-                { _id: req.params.id },
-                {
-                    ...values,
-                    profilePicture: createImage(req.file),
-                }
-            );
-        } else {
-            console.log('WASASTT');
-            await User.updateOne({ _id: req.params.id }, values);
+            res.status(200).send(user);
+        } catch {
+            res.sendStatus(401);
         }
-
-        res.sendStatus(200);
-    } catch (err) {
-        res.status(500).send(err);
     }
 });
 
-router.delete('/:id', async (req, res) => {
-    try {
-        await User.deleteOne({ _id: req.params.id });
-        res.sendStatus(200);
-    } catch (err) {
-        res.status(500).send(err);
+router.put(
+    '/:id',
+    requireLogin,
+    upload.single('profilePicture'),
+    async (req, res) => {
+        // @ts-ignore
+        if (req.user?.id !== req.params.id) {
+            res.sendStatus(401);
+        } else {
+            try {
+                const { ...values } = req.body;
+
+                if (req.file) {
+                    await User.updateOne(
+                        { _id: req.params.id },
+                        {
+                            ...values,
+                            profilePicture: createImage(req.file),
+                        }
+                    );
+                } else {
+                    await User.updateOne({ _id: req.params.id }, values);
+                }
+
+                res.sendStatus(200);
+            } catch (err) {
+                res.status(500).send(err);
+            }
+        }
+    }
+);
+
+router.delete('/', requireLogin, async (req, res) => {
+    // @ts-ignore
+    if (!req.user) {
+        res.sendStatus(401);
+    } else {
+        // @ts-ignore
+        const { id } = req.user;
+        try {
+            await User.deleteOne({ _id: id });
+            res.sendStatus(200);
+        } catch (err) {
+            res.status(500).send(err);
+        }
     }
 });
 

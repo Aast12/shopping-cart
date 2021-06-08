@@ -1,7 +1,7 @@
 import { getModelForClass, prop } from '@typegoose/typegoose';
 
 export class Product {
-    @prop({ unique: true })
+    @prop({})
     public name: string;
 
     @prop({})
