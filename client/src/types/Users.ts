@@ -1,5 +1,5 @@
 export type Order = {
-    _id?: string;
+    _id: string;
     products: {
         product: string;
         quantity: number;

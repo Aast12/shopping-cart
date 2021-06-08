@@ -6,11 +6,12 @@ import Products from './pages/admin/Products';
 import Profile from './pages/Profile';
 import { Provider } from 'react-redux';
 import store from './redux/store';
-import PrivateRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/ProtectedRoute';
 import Feed from './pages/Feed';
 import { PersistGate } from 'redux-persist/integration/react';
 import ProductDetail from './pages/ProductDetail';
 import ShoppingCart from './pages/ShoppingCart';
+import Orders from './pages/Orders';
 
 function App() {
     return (
@@ -21,21 +22,29 @@ function App() {
                         <Box w="100%" minH="100vh" bgColor="gray.50">
                             <NavBar />
                             <Switch>
-                                <Route path="/products" component={Products} />
-                                <PrivateRoute exact path="/" component={Feed} />
-                                <PrivateRoute
+                                <ProtectedRoute
+                                    role="admin"
+                                    path="/products"
+                                    component={Products}
+                                />
+                                <ProtectedRoute
                                     path="/profile"
                                     component={Profile}
                                 />
-                                <PrivateRoute
+                                <ProtectedRoute
                                     path="/product/:id"
                                     component={ProductDetail}
                                 />
-                                <PrivateRoute
+                                <ProtectedRoute
                                     path="/cart"
                                     component={ShoppingCart}
                                 />
+                                <ProtectedRoute
+                                    path="/orders"
+                                    component={Orders}
+                                />
                                 <Route path="/login" component={Landing} />
+                                <ProtectedRoute exact path="/" component={Feed} />
                             </Switch>
                         </Box>
                     </Router>

@@ -2,7 +2,7 @@ import { Spinner } from '@chakra-ui/react';
 import { Route, Redirect } from 'react-router-dom';
 import useUser from '../hooks/useUser';
 
-export default function PrivateRoute({ role = 'user', ...props }) {
+export default function ProtectedRoute({ role = 'user', ...props }) {
     const { user, isLoading } = useUser();
     const { component: Component, ...rest } = props;
 

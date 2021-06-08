@@ -27,6 +27,7 @@ import {
 import axios from 'axios';
 import { useMemo } from 'react';
 import Card from '../components/Card';
+import OrderItemSummary from '../components/OrderItemSummary';
 import useProducts from '../hooks/useProducts';
 import useShoppingCart from '../hooks/useShoppingCart';
 import useUser from '../hooks/useUser';
@@ -61,6 +62,7 @@ const ShoppingCart = () => {
             .post('/orders/create', cartProducts)
             .then((res) => {
                 console.log(res);
+                drop();
             })
             .catch((err) => {
                 console.log(err);
@@ -101,102 +103,39 @@ const ShoppingCart = () => {
                         </Text>
                     )}
                     {filteredProducts.map(({ product, quantity }) => (
-                        <Box py={4}>
-                            <Stack direction={['column', 'row']} spacing={4}>
-                                <Box
-                                    h="10em"
-                                    w={['100%', '10em']}
-                                    bgColor="gray.100"
-                                    borderRadius="lg"
-                                    overflow="hidden"
-                                    borderWidth="0"
-                                >
-                                    {product?.image && (
-                                        <Image
-                                            height="100%"
-                                            w="100%"
-                                            objectFit="cover"
-                                            src={`data:${product.image.contentType};base64,${product.image.data}`}
-                                        />
-                                    )}
-                                </Box>
-                                <Flex
-                                    flex="1"
-                                    w="100%"
-                                    direction="column"
-                                    justifyContent="space-between"
-                                >
-                                    <Box>
-                                        <Heading size="md">
-                                            {product.name}
-                                        </Heading>
-                                        {product.brand && (
-                                            <Heading
-                                                size="sm"
-                                                fontWeight="medium"
-                                                color="gray.500"
-                                            >
-                                                By {product.brand}
-                                            </Heading>
-                                        )}
-                                        <Stat size="sm">
-                                            <StatNumber>
-                                                {formatter.format(
-                                                    product.price
-                                                )}
-                                            </StatNumber>
-                                        </Stat>
-                                    </Box>
-                                    <Stack
-                                        direction={['column', 'row']}
-                                        align="center"
+                        <OrderItemSummary
+                            key={product._id}
+                            product={product}
+                            quantity={quantity ?? 0}
+                            bottomComponent={
+                                <HStack>
+                                    <IconButton
+                                        size="sm"
+                                        colorScheme="red"
+                                        onClick={() => del(product._id)}
+                                        aria-label="Remove from cart"
+                                        icon={<DeleteIcon />}
+                                    />
+                                    <NumberInput
+                                        size="sm"
+                                        defaultValue={1}
+                                        value={quantity ?? 0}
+                                        onChange={(e) =>
+                                            add(product._id, parseInt(e), true)
+                                        }
+                                        min={1}
+                                        isDisabled={(product.stock ?? 0) === 0}
+                                        max={product.stock ?? 0}
                                     >
-                                        <Stat size="sm">
-                                            <StatLabel>Cost</StatLabel>
-                                            <StatNumber>
-                                                {formatter.format(
-                                                    product.price *
-                                                        (quantity ?? 0)
-                                                )}
-                                            </StatNumber>
-                                        </Stat>
-                                        <HStack>
-                                            <IconButton
-                                                size="sm"
-                                                colorScheme="red"
-                                                onClick={() => del(product._id)}
-                                                aria-label="Remove from cart"
-                                                icon={<DeleteIcon />}
-                                            />
-                                            <NumberInput
-                                                size="sm"
-                                                defaultValue={1}
-                                                value={quantity ?? 0}
-                                                onChange={(e) =>
-                                                    add(
-                                                        product._id,
-                                                        parseInt(e),
-                                                        true
-                                                    )
-                                                }
-                                                min={1}
-                                                isDisabled={
-                                                    (product.stock ?? 0) === 0
-                                                }
-                                                max={product.stock ?? 0}
-                                            >
-                                                <NumberInputField focusBorderColor="red.200" />
-                                                <NumberInputStepper>
-                                                    <NumberIncrementStepper />
-                                                    <NumberDecrementStepper />
-                                                </NumberInputStepper>
-                                            </NumberInput>
-                                        </HStack>
-                                    </Stack>
-                                </Flex>
-                            </Stack>
-                            <Divider mt={4} />
-                        </Box>
+                                        <NumberInputField focusBorderColor="red.200" />
+                                        <NumberInputStepper>
+                                            <NumberIncrementStepper />
+                                            <NumberDecrementStepper />
+                                        </NumberInputStepper>
+                                    </NumberInput>
+                                </HStack>
+                            }
+                        />
                     ))}
                 </Card>
                 <Box minW="xs">

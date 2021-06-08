@@ -47,9 +47,6 @@ const NavBar = ({ ...props }: BoxProps) => {
                     Shopping
                 </Heading>
                 <HStack alignItems="center">
-                    <Link as={RouterLink} to="/products">
-                        Explore
-                    </Link>
                     <Box position="relative">
                         <IconButton
                             _hover={{
@@ -114,6 +111,9 @@ const NavBar = ({ ...props }: BoxProps) => {
                         <MenuList color="black">
                             <MenuItem as={RouterLink} to="/profile">
                                 Profile
+                            </MenuItem>
+                            <MenuItem as={RouterLink} to="/orders">
+                                My Orders
                             </MenuItem>
                             <MenuItem onClick={logOut}>Log Out</MenuItem>
                         </MenuList>
