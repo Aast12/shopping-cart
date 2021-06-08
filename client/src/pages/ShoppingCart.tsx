@@ -14,8 +14,6 @@ import {
     StatLabel,
     StatNumber,
     ButtonGroup,
-    Image,
-    Flex,
     NumberInput,
     NumberInputField,
     NumberInputStepper,
@@ -27,7 +25,9 @@ import {
 import axios from 'axios';
 import { useMemo } from 'react';
 import Card from '../components/Card';
+import EventModal from '../components/EventModal';
 import OrderItemSummary from '../components/OrderItemSummary';
+import useEventModalState from '../hooks/useEventModalState';
 import useProducts from '../hooks/useProducts';
 import useShoppingCart from '../hooks/useShoppingCart';
 import useUser from '../hooks/useUser';
@@ -37,6 +37,10 @@ const ShoppingCart = () => {
     const { del, add, products: cartProducts, drop } = useShoppingCart();
     const { products, loading, error } = useProducts();
     const { user, isLoading, pictureSrc } = useUser();
+
+    const { checkoutState, setError, setSuccess, trigger } = useEventModalState(
+        {}
+    );
 
     const filteredProducts = useMemo(() => {
         return products
@@ -58,14 +62,21 @@ const ShoppingCart = () => {
     }, [filteredProducts]);
 
     const checkout = () => {
+        trigger();
         axios
             .post('/orders/create', cartProducts)
             .then((res) => {
                 console.log(res);
+                setSuccess('Your order was created succesfully!');
                 drop();
             })
             .catch((err) => {
                 console.log(err);
+                if (err.message) {
+                    setError(err.message);
+                } else {
+                    setError('An error ocurred while creating your order');
+                }
             });
     };
 
@@ -159,6 +170,7 @@ const ShoppingCart = () => {
                     </Card>
                 </Box>
             </Stack>
+            <EventModal {...checkoutState} />
         </Container>
     );
 };
