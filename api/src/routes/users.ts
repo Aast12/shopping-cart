@@ -16,6 +16,9 @@ router.route('/').get(requireLogin, async (req: Request, res) => {
 
 router.post('/create', upload.single('image'), async (req, res) => {
     try {
+        if (await User.findOne({ email: req.body.email })) {
+            return res.status(409).send({ message: 'Email already in use' });
+        }
         const newUser = new User(req.body);
 
         if (req.file) {
@@ -25,8 +28,9 @@ router.post('/create', upload.single('image'), async (req, res) => {
         await newUser.save();
         res.sendStatus(200);
     } catch (err) {
-        res.status(500).send(err);
+        res.status(500).send({ message: 'The user could not be created' });
     }
+    return;
 });
 
 router.put('/:id', upload.single('profilePicture'), async (req, res) => {

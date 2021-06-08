@@ -23,11 +23,6 @@ function App() {
                             <NavBar />
                             <Switch>
                                 <ProtectedRoute
-                                    role="admin"
-                                    path="/products"
-                                    component={Products}
-                                />
-                                <ProtectedRoute
                                     path="/profile"
                                     component={Profile}
                                 />
@@ -44,7 +39,16 @@ function App() {
                                     component={Orders}
                                 />
                                 <Route path="/login" component={Landing} />
-                                <ProtectedRoute exact path="/" component={Feed} />
+                                <ProtectedRoute
+                                    exact
+                                    path="/"
+                                    component={Feed}
+                                />
+                                <ProtectedRoute
+                                    role="admin"
+                                    path="/products"
+                                    component={Products}
+                                />
                             </Switch>
                         </Box>
                     </Router>

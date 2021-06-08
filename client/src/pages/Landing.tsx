@@ -1,16 +1,15 @@
+import { CheckIcon } from '@chakra-ui/icons';
 import {
     Box,
     Button,
     Center,
     Flex,
     Heading,
-    Input,
     Link,
     Modal,
     ModalBody,
     ModalCloseButton,
     ModalContent,
-    ModalFooter,
     ModalHeader,
     ModalOverlay,
     Stack,
@@ -19,14 +18,13 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import Card from '../components/Card';
 import { ValidatedInput } from '../components/FormComponents';
 import useAuth from '../hooks/useAuth';
 import useUser from '../hooks/useUser';
-import { setUser } from '../redux/slices/user';
 import { User } from '../types/Users';
 
 type SignUpData = Omit<User, 'profilePicture' | '_id' | 'orders'> & {
@@ -42,6 +40,9 @@ const SignUpModal = ({
     onClose: () => void;
 }) => {
     const methods = useForm<SignUpData>();
+    const [error, setError] = useState<string>();
+    const [success, setSuccess] = useState<boolean>();
+    const [loading, setLoading] = useState<boolean>(false);
 
     const {
         handleSubmit,
@@ -50,87 +51,116 @@ const SignUpModal = ({
     } = methods;
 
     const onSubmit = (values: SignUpData) => {
+        setLoading(true);
         axios
             .post('/users/create', values)
-            .then((res) => {})
+            .then(() => {
+                setSuccess(true);
+            })
             .catch((err) => {
-                console.error(err);
-            });
+                const msg = err?.response?.data?.message;
+                msg ? setError(msg) : setError('User could not be created');
+            })
+            .finally(() => setLoading(false));
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={onClose} closeOnOverlayClick={!loading}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Sign Up</ModalHeader>
-                <ModalCloseButton />
+                <ModalCloseButton disabled={loading} />
                 <ModalBody>
-                    <FormProvider {...methods}>
-                        <form onSubmit={handleSubmit(onSubmit)}>
-                            <VStack align="start" spacing={3}>
-                                <Stack w="100%" direction={['column', 'row']}>
+                    {success ? (
+                        <VStack pb={8} color="green.500">
+                            <CheckIcon fontSize="5xl" />
+                            <Text>Your account was succesfully created</Text>
+                        </VStack>
+                    ) : (
+                        <FormProvider {...methods}>
+                            <form onSubmit={handleSubmit(onSubmit)}>
+                                <VStack align="start" spacing={3}>
+                                    <Stack
+                                        w="100%"
+                                        direction={['column', 'row']}
+                                    >
+                                        <ValidatedInput
+                                            isDisabled={loading}
+                                            placeholder="Given Name"
+                                            field={'givenName'}
+                                            registerOptions={{
+                                                required: 'This is required',
+                                            }}
+                                        />
+                                        <ValidatedInput
+                                            isDisabled={loading}
+                                            placeholder="Last Name"
+                                            field={'lastName'}
+                                            registerOptions={{
+                                                required: 'This is required',
+                                            }}
+                                        />
+                                    </Stack>
                                     <ValidatedInput
-                                        placeholder="Given Name"
-                                        field={'givenName'}
+                                        isDisabled={loading}
+                                        placeholder="Email"
+                                        type="email"
+                                        field={'email'}
                                         registerOptions={{
                                             required: 'This is required',
                                         }}
                                     />
                                     <ValidatedInput
-                                        placeholder="Last Name"
-                                        field={'lastName'}
+                                        isDisabled={loading}
+                                        placeholder="Password"
+                                        type="password"
+                                        field={'password'}
                                         registerOptions={{
                                             required: 'This is required',
+                                            minLength: {
+                                                value: 6,
+                                                message:
+                                                    'Minimum length should be 6',
+                                            },
                                         }}
                                     />
-                                </Stack>
-                                <ValidatedInput
-                                    placeholder="Email"
-                                    type="email"
-                                    field={'email'}
-                                    registerOptions={{
-                                        required: 'This is required',
-                                    }}
-                                />
-                                <ValidatedInput
-                                    placeholder="Password"
-                                    type="password"
-                                    field={'password'}
-                                    registerOptions={{
-                                        required: 'This is required',
-                                        minLength: {
-                                            value: 6,
-                                            message:
-                                                'Minimum length should be 6',
-                                        },
-                                    }}
-                                />
-                                <ValidatedInput
-                                    placeholder="Confirm Password"
-                                    type="password"
-                                    field={'passwordConfirmation'}
-                                    registerOptions={{
-                                        required: 'This is required',
-                                        validate: (val) =>
-                                            val === watch('password'),
-                                    }}
-                                    customError={
-                                        errors.passwordConfirmation &&
-                                        errors.passwordConfirmation.type ===
-                                            'validate' && (
-                                            <span>Passwords must match</span>
-                                        )
-                                    }
-                                />
+                                    <ValidatedInput
+                                        isDisabled={loading}
+                                        placeholder="Confirm Password"
+                                        type="password"
+                                        field={'passwordConfirmation'}
+                                        registerOptions={{
+                                            required: 'This is required',
+                                            validate: (val) =>
+                                                val === watch('password'),
+                                        }}
+                                        customError={
+                                            errors.passwordConfirmation &&
+                                            errors.passwordConfirmation.type ===
+                                                'validate' && (
+                                                <span>
+                                                    Passwords must match
+                                                </span>
+                                            )
+                                        }
+                                    />
 
-                                <Button w="100%" type="submit">
-                                    Sign Up
-                                </Button>
-                            </VStack>
-                        </form>
-                    </FormProvider>
+                                    <Button
+                                        w="100%"
+                                        type="submit"
+                                        colorScheme="teal"
+                                        isLoading={loading}
+                                    >
+                                        Sign Up
+                                    </Button>
+                                    {error && (
+                                        <Text color="red.500">{error}</Text>
+                                    )}
+                                </VStack>
+                            </form>
+                        </FormProvider>
+                    )}
                 </ModalBody>
-                <ModalFooter></ModalFooter>
             </ModalContent>
         </Modal>
     );
@@ -203,6 +233,7 @@ const Landing = () => {
                                 </Link>
                             </Text>
                         </Flex>
+
                         <SignUpModal isOpen={isOpen} onClose={onClose} />
                     </Card>
                 </Center>
