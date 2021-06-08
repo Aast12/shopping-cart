@@ -15,6 +15,7 @@ import {
     Select,
     ButtonGroup,
     Image,
+    Stack,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
@@ -26,6 +27,10 @@ import {
     ValidatedInput,
     ValidatedInputProps,
 } from '../../components/FormComponents';
+import useEventModalState from '../../hooks/useEventModalState';
+import EventModal from '../../components/EventModal';
+import Card from '../../components/Card';
+import { formatter } from '../../utils';
 // import { toBase64 } from '../../utils';
 
 const castInputProps = (
@@ -42,6 +47,10 @@ const Products = () => {
     const { handleSubmit, register, setValue, watch } = methods;
     const [imageValue] = watch(['image']);
     const [imageSrc, setImageSrc] = useState<string | ArrayBuffer | null>(null);
+    const { eventState, reset, setSuccess, setError, trigger } =
+        useEventModalState({});
+
+    console.log('lol', products);
 
     const isCompact = useBreakpointValue({ base: true, md: false });
 
@@ -58,13 +67,54 @@ const Products = () => {
         if (image && image.length > 0) payload.image = image[0];
 
         if (adding) {
-            create(payload);
+            trigger();
+            create(payload)
+                .then((res) => {
+                    console.log(res);
+                    setSuccess('The product was created succesfully');
+                })
+                .catch((err) => {
+                    console.log(err);
+                    const msg =
+                        err.respose?.data?.message ?? 'An error ocurred';
+                    setError(msg);
+                });
         } else if (selected?._id) {
+            trigger();
             edit({
                 ...payload,
                 _id: selected._id,
-            });
+            })
+                .then((res) => {
+                    console.log(res);
+                    setSuccess('The product was updated succesfully');
+                })
+                .catch((err) => {
+                    console.log(err);
+                    const msg =
+                        err.respose?.data?.message ?? 'An error ocurred';
+                    setError(msg);
+                });
         }
+    };
+
+    const deleteProduct = () => {
+        trigger();
+        selected?._id &&
+            del(selected._id)
+                .then((res) => {
+                    console.log(res);
+                    setSuccess('The product was deleted succesfully');
+                })
+                .catch((err) => {
+                    console.log(err);
+                    const msg =
+                        err.respose?.data?.message ?? 'An error ocurred';
+                    setError(msg);
+                })
+                .finally(() => {
+                    setSelected(undefined);
+                });
     };
 
     useEffect(() => {
@@ -118,10 +168,11 @@ const Products = () => {
         <Container maxW="container.lg" py={8}>
             <Heading lineHeight="tall">Products</Heading>
             <hr />
-            <Flex my={2} direction={isCompact ? 'column' : 'row'}>
+            <Stack my={2} direction={isCompact ? 'column' : 'row'} flex="1">
                 <VStack as="aside" w={isCompact ? '100%' : 'xs'} px={2} pb={2}>
                     {isCompact && (
                         <Select
+                            bgColor="white"
                             w="100%"
                             onChange={(e) =>
                                 selectProduct(
@@ -150,6 +201,7 @@ const Products = () => {
                     )}
                     <Button
                         w="100%"
+                        py={3}
                         leftIcon={<AiOutlinePlus />}
                         onClick={() => {
                             selectProduct({} as Product);
@@ -159,8 +211,8 @@ const Products = () => {
                         Add Product
                     </Button>
                     {!isCompact && (
-                        <>
-                            <InputGroup w="100%">
+                        <Box w="100%">
+                            <InputGroup w="100%" mb={2}>
                                 <InputLeftElement children={<SearchIcon />} />
                                 <Input
                                     onChange={(e) =>
@@ -172,13 +224,13 @@ const Products = () => {
                                     placeholder="Search"
                                 />
                             </InputGroup>
-                            <Box w="100%">
+                            <Box w="100%" flex="1" maxH="50vh" overflowY="auto">
                                 {products.length === 0 ? (
                                     <Text w="100%" textAlign="center">
                                         There are no products
                                     </Text>
                                 ) : (
-                                    <VStack w="100">
+                                    <VStack w="100" overflowY="scroll">
                                         {products
                                             .filter((p) =>
                                                 p.name
@@ -187,9 +239,10 @@ const Products = () => {
                                             )
                                             .map((p, i) => (
                                                 <Box
+                                                    bgColor="white"
                                                     cursor="pointer"
                                                     _hover={{
-                                                        bgColor: 'gray.50',
+                                                        bgColor: 'cyan.50',
                                                     }}
                                                     onClick={() =>
                                                         selectProduct(p)
@@ -200,20 +253,49 @@ const Products = () => {
                                                     key={p._id ?? ''}
                                                     w="100%"
                                                 >
-                                                    <Text>{p.name}</Text>
-                                                    <Text>{p.description}</Text>
-                                                    <Text>{p.price}</Text>
+                                                    <Flex
+                                                        flexWrap="wrap"
+                                                        alignItems="center"
+                                                    >
+                                                        <Text
+                                                            fontWeight="bold"
+                                                            mr={1}
+                                                        >
+                                                            {p.name}
+                                                        </Text>
+                                                        {p.brand && (
+                                                            <Text
+                                                                fontSize="sm"
+                                                                color="gray.500"
+                                                                mr={1}
+                                                            >
+                                                                {p.brand}
+                                                            </Text>
+                                                        )}
+                                                    </Flex>
+                                                    <Text
+                                                        fontSize="sm"
+                                                        color="gray.500"
+                                                        noOfLines={2}
+                                                    >
+                                                        {p.description}
+                                                    </Text>
+                                                    <Text>
+                                                        {formatter.format(
+                                                            p.price
+                                                        )}
+                                                    </Text>
                                                 </Box>
                                             ))}
                                     </VStack>
                                 )}
                             </Box>
-                        </>
+                        </Box>
                     )}
                 </VStack>
                 <Box px={2} flex="1">
                     {selected ? (
-                        <Box>
+                        <Card>
                             <FormProvider {...methods}>
                                 <form onSubmit={handleSubmit(onSubmit)}>
                                     <VStack align="start">
@@ -272,12 +354,19 @@ const Products = () => {
                                             {...castInputProps({
                                                 field: 'stock',
                                                 registerOptions: {
-                                                    min: 0,
+                                                    min: {
+                                                        message:
+                                                            'Stock can not be negative',
+                                                        value: 0,
+                                                    },
                                                 },
                                             })}
                                         />
-                                        {imageSrc && (
+                                        {imageSrc ? (
                                             <Image
+                                                w="100%"
+                                                objectFit="contain"
+                                                height="xs"
                                                 src={
                                                     typeof imageSrc === 'string'
                                                         ? imageSrc
@@ -285,6 +374,10 @@ const Products = () => {
                                                 }
                                                 alt={selected.name}
                                             />
+                                        ) : (
+                                            <Center w="100%" height="xs">
+                                                <Text>No image</Text>
+                                            </Center>
                                         )}
                                         <Flex my={2} w="100%">
                                             <FileUpload
@@ -295,16 +388,13 @@ const Products = () => {
                                                     variant="outline"
                                                     colorScheme="blackAlpha"
                                                 >
-                                                    Edit image
+                                                    Update image
                                                 </Button>
                                             </FileUpload>
                                             {!adding ? (
                                                 <ButtonGroup>
                                                     <Button
-                                                        onClick={() =>
-                                                            selected?._id &&
-                                                            del(selected._id)
-                                                        }
+                                                        onClick={deleteProduct}
                                                         colorScheme="red"
                                                     >
                                                         Delete
@@ -332,7 +422,7 @@ const Products = () => {
                                     </VStack>
                                 </form>
                             </FormProvider>
-                        </Box>
+                        </Card>
                     ) : (
                         <Center>
                             <Text color="gray.300">
@@ -341,7 +431,8 @@ const Products = () => {
                         </Center>
                     )}
                 </Box>
-            </Flex>
+            </Stack>
+            <EventModal {...eventState} />
         </Container>
     );
 };

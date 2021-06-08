@@ -20,38 +20,42 @@ function App() {
             <Provider store={store.store}>
                 <PersistGate persistor={store.persistor} loading={null}>
                     <Router>
-                        <Box w="100%" minH="100vh" bgColor="gray.50">
-                            <NavBar />
-                            <Switch>
-                                <ProtectedRoute
-                                    role="both"
-                                    path="/profile"
-                                    component={Profile}
-                                />
-                                <ProtectedRoute
-                                    path="/product/:id"
-                                    component={ProductDetail}
-                                />
-                                <ProtectedRoute
-                                    path="/cart"
-                                    component={ShoppingCart}
-                                />
-                                <ProtectedRoute
-                                    path="/orders"
-                                    component={Orders}
-                                />
-                                <MultipleRoute
-                                    exact
-                                    path="/"
-                                    adminComponent={Products}
-                                    userComponent={Feed}
-                                />
-                                <Route path="/login" component={Landing} />
-                            </Switch>
-                        </Box>
+                        <NavBar />
+                        <Switch>
+                            <ProtectedRoute
+                                role="both"
+                                path="/profile"
+                                component={Profile}
+                            />
+                            <ProtectedRoute
+                                path="/product/:id"
+                                component={ProductDetail}
+                            />
+                            <ProtectedRoute
+                                path="/cart"
+                                component={ShoppingCart}
+                            />
+                            <ProtectedRoute path="/orders" component={Orders} />
+                            <MultipleRoute
+                                exact
+                                path="/"
+                                adminComponent={Products}
+                                userComponent={Feed}
+                            />
+                            <Route path="/login" component={Landing} />
+                        </Switch>
                     </Router>
                 </PersistGate>
             </Provider>
+            <Box
+                zIndex={-1}
+                w="100%"
+                minH="100vh"
+                bgColor="gray.50"
+                position="fixed"
+                top="0"
+                left="0"
+            ></Box>
         </ChakraProvider>
     );
 }

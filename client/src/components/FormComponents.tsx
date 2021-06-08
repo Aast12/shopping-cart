@@ -6,6 +6,7 @@ import {
     Input,
     InputGroup,
     InputProps,
+    Textarea,
 } from '@chakra-ui/react';
 import { ReactNode, useRef } from 'react';
 import {
@@ -34,14 +35,28 @@ export const ValidatedInput = <T,>({
         register,
         formState: { errors },
     } = useFormContext<T>();
+    // if (errors[field]) console.log(errors[field]);
     return (
-        <FormControl isRequired={registerOptions.required ? true : false} isInvalid={errors[field] ? true : false}>
+        <FormControl
+            isRequired={registerOptions.required ? true : false}
+            isInvalid={errors[field] ? true : false}
+        >
             {label && <FormLabel {...labelProps}>{label}</FormLabel>}
-            <Input
-                {...props}
+            {props.type === 'textarea' ? (
                 // @ts-ignore
-                {...register(field, registerOptions)}
-            />
+                <Textarea
+                    {...props}
+                    // @ts-ignore
+                    {...register(field, registerOptions)}
+                />
+            ) : (
+                <Input
+                    {...props}
+                    // @ts-ignore
+                    {...register(field, registerOptions)}
+                />
+            )}
+
             <FormErrorMessage>
                 {/* @ts-ignore */}
                 {errors[field] && errors[field]?.message}

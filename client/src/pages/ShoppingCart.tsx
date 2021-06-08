@@ -38,7 +38,7 @@ const ShoppingCart = () => {
     const { products, loading, error } = useProducts();
     const { user, isLoading, pictureSrc } = useUser();
 
-    const { checkoutState, setError, setSuccess, trigger } = useEventModalState(
+    const { eventState, setError, setSuccess, trigger } = useEventModalState(
         {}
     );
 
@@ -170,7 +170,7 @@ const ShoppingCart = () => {
                     </Card>
                 </Box>
             </Stack>
-            <EventModal {...checkoutState} />
+            <EventModal {...eventState} />
         </Container>
     );
 };

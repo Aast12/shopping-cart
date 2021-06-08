@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-type CheckoutState = {
+type EventState = {
     gotError: boolean;
     gotSuccess: boolean;
     isLoading: boolean;
@@ -11,9 +11,9 @@ type CheckoutState = {
 const useEventModalState = ({
     initialState,
 }: {
-    initialState?: CheckoutState;
+    initialState?: EventState;
 }) => {
-    const [checkoutState, setCheckoutState] = useState<CheckoutState>(
+    const [eventState, setEventState] = useState<EventState>(
         initialState ?? {
             gotError: false,
             gotSuccess: false,
@@ -24,12 +24,12 @@ const useEventModalState = ({
     );
 
     const trigger = () => {
-        setCheckoutState({ ...checkoutState, isLoading: true });
+        setEventState({ ...eventState, isLoading: true });
     };
 
     const setError = (errorMessage: string = 'An error occured') => {
-        setCheckoutState({
-            ...checkoutState,
+        setEventState({
+            ...eventState,
             isLoading: false,
             gotError: true,
             errorMessage,
@@ -37,15 +37,40 @@ const useEventModalState = ({
     };
 
     const setSuccess = (successMessage: string = 'Success!') => {
-        setCheckoutState({
-            ...checkoutState,
+        setEventState({
+            ...eventState,
             isLoading: false,
             gotSuccess: true,
             successMessage,
         });
     };
 
-    return { checkoutState, setError, setSuccess, trigger };
+    const reset = () => {
+        setEventState(
+            initialState ?? {
+                gotError: false,
+                gotSuccess: false,
+                isLoading: false,
+                successMessage: 'Success!',
+                errorMessage: 'An error occured',
+            }
+        );
+    };
+
+    const triggerReset = () => {
+        setEventState({
+            ...(initialState ?? {
+                gotError: false,
+                gotSuccess: false,
+
+                successMessage: 'Success!',
+                errorMessage: 'An error occured',
+            }),
+            isLoading: true,
+        });
+    };
+
+    return { eventState, setError, setSuccess, trigger, reset };
 };
 
 export default useEventModalState;

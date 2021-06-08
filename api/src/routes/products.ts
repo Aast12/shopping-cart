@@ -30,7 +30,9 @@ router.post('/create', upload.single('image'), async (req, res) => {
         }
 
         await newProduct.save();
-        res.sendStatus(200);
+        res.status(200).send({
+            id: newProduct._id,
+        });
     } catch (err) {
         res.status(500).send(err);
     }

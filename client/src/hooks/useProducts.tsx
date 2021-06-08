@@ -13,23 +13,38 @@ const useProducts = () => {
     const [error, setError] = useState<any>(null);
     const [products, setProducts] = useState<Product[]>([]);
 
-    const create = (values: Omit<ProductPostPayload, '_id'>) => {
+    const create = async (values: Omit<ProductPostPayload, '_id'>) => {
         const form = new FormData();
         Object.keys(values).forEach((key) => {
             // @ts-ignore
             form.append(key, values[key]);
         });
 
-        return axios.post('/products/create', form);
+        await axios.post('/products/create', form).then(async (res) => {
+            const { image, ...createData } = values;
+            const { id } = res.data;
+            if (id) {
+                const newProduct: Product = { ...createData, _id: res.data.id };
+                if (image) {
+                    let imData = image ? await toBase64(image) : null;
+
+                    if (image && typeof imData === 'string') {
+                        newProduct.image = {
+                            contentType: image.type,
+                            data: imData,
+                        };
+                    }
+                }
+
+                setProducts([...products, newProduct]);
+            }
+        });
     };
 
-    const del = (id: string) => {
-        axios
-            .delete(`/products/${id}`)
-            .then((res) => {
-                setProducts(products.filter((p) => p._id !== id));
-            })
-            .catch(console.error);
+    const del = async (id: string) => {
+        await axios.delete(`/products/${id}`).then((res) => {
+            setProducts(products.filter((p) => p._id !== id));
+        });
     };
 
     const edit = async (values: ProductPostPayload) => {
@@ -43,16 +58,16 @@ const useProducts = () => {
         await axios.put(`/products/${_id}`, form).then(async (res) => {
             const { image, ...newValues } = data;
             let copy = [...products];
-            let match = copy.find((p) => p._id === _id);
+            let matchIdx = copy.findIndex((p) => p._id === _id);
             let imData = image ? await toBase64(image) : null;
-            match = {
-                ...match,
+            copy[matchIdx] = {
+                ...copy[matchIdx],
                 ...newValues,
                 _id,
             };
 
             if (image && typeof imData === 'string') {
-                match.image = {
+                copy[matchIdx].image = {
                     contentType: image.type,
                     data: imData,
                 };
