@@ -45,3 +45,5 @@ cd client && npm run start
 ```
 
 3. Open localhost:3000
+
+:)
